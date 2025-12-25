@@ -6,3 +6,50 @@ Auth_Service Info
   "role": "DONOR"
 }
 
+{
+  "email": "ngo@test1.com",
+  "password": "password222",
+  "role" : "NGO"
+}
+
+{
+  "email": "driver@test1.com",
+  "password": "password333",
+  "role" : "DRIVER"
+}
+
+profiles/donor
+{
+  "userId": 1,
+  "name": "krish Patel",
+  "phone": "9537694516",
+  "address": "Kiran Chowk, Surat",
+  "city": "Ahmedabad"
+}
+
+profiles/ngo
+
+{
+  "userId": 2,
+  "ngoName": "Helping Hands Foundation",
+  "registrationNumber": "NGO-REG-1234",
+  "contactPerson": "Amit Shah",
+  "phone": "8888888888",
+  "address": "Satellite, Ahmedabad",
+  "city": "Ahmedabad"
+}
+
+profile/driver
+
+{
+  "userId": 3,
+  "name": "Ramesh Kumar",
+  "phone": "7777777777",
+  "vehicleType": "VAN",
+  "vehicleNumber": "GJ01AB1234",
+  "licenseNumber": "DL-123456789"
+}
+
+
+
+

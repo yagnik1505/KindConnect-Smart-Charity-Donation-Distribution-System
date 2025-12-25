@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/kindconnect/Auth_Service/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/Profile_Service/pom.xml" />
       </list>
     </option>
   </component>
