@@ -1,0 +1,8 @@
+Auth_Service Info
+
+{
+  "email": "donor@test.com",
+  "password": "password123",
+  "role": "DONOR"
+}
+
