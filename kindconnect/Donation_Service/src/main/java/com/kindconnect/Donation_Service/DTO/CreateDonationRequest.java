@@ -13,5 +13,6 @@ public class CreateDonationRequest {
     @Min(1)
     private int quantity;
 
+    @NotBlank
     private String description;
 }
