@@ -7,9 +7,6 @@ import lombok.Data;
 @Data
 public class DonorProfileRequest {
 
-    @NotNull
-    private Long userId;
-
     @NotBlank
     private String name;
 

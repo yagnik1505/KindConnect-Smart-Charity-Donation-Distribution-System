@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,97 +21,96 @@ public class DonationController {
 
     private final DonationService donationService;
 
-    // CREATE DONATION
+    private Long currentUserId() {
+        return (Long) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+    }
+
+    // ================= CREATE =================
     @PostMapping
+    @PreAuthorize("hasRole('DONOR')")
+
     public ResponseEntity<?> createDonation(
-            @RequestBody @Valid CreateDonationRequest request) {
+            @Valid @RequestBody CreateDonationRequest request
+    ) {
 
-        // TEMP – will be replaced by JWT
-        Long donorUserId = 1L;
+        Donation donation =
+                donationService.createDonation(currentUserId(), request);
 
-        Donation donation = donationService.createDonation(donorUserId, request);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of(
                         "message", "Donation created successfully",
                         "donationId", donation.getId()
                 ));
     }
 
-    // GET MY DONATIONS
+    // ================= MY DONATIONS =================
     @GetMapping("/my")
+    @PreAuthorize("hasRole('DONOR')")
     public ResponseEntity<List<Donation>> getMyDonations() {
-
-        Long donorUserId = 1L; // TEMP
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(donationService.getMyDonations(donorUserId));
+        return ResponseEntity.ok(
+                donationService.getMyDonations(currentUserId())
+        );
     }
 
-    // CANCEL DONATION
+    // ================= CANCEL =================
     @PutMapping("/{donationId}/cancel")
+    @PreAuthorize("hasRole('DONOR')")
     public ResponseEntity<?> cancelDonation(@PathVariable Long donationId) {
 
-        Long donorUserId = 1L; // TEMP – JWT later
+        donationService.cancelDonation(donationId, currentUserId());
 
-        donationService.cancelDonation(donationId, donorUserId);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(Map.of(
-                        "message", "Donation cancelled successfully",
-                        "donationId", donationId
-                ));
+        return ResponseEntity.ok(
+                Map.of("message", "Donation cancelled", "donationId", donationId)
+        );
     }
 
-    // TRACK DONATION BY ID
+    // ================= GET BY ID =================
     @GetMapping("/{donationId}")
+    @PreAuthorize("hasAnyRole('DONOR','NGO','DRIVER')")
     public ResponseEntity<Donation> getDonationById(
-            @PathVariable Long donationId) {
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(donationService.getDonation(donationId));
+            @PathVariable Long donationId
+    ) {
+        return ResponseEntity.ok(
+                donationService.getDonation(donationId)
+        );
     }
 
+    // ================= ACCEPT =================
     @PutMapping("/{donationId}/accept")
+    @PreAuthorize("hasRole('NGO')")
     public ResponseEntity<?> acceptDonation(@PathVariable Long donationId) {
 
-        Long ngoUserId = 10L; // TEMP (JWT later)
-
-        donationService.acceptDonation(donationId, ngoUserId);
+        donationService.acceptDonation(donationId, currentUserId());
 
         return ResponseEntity.ok(
                 Map.of("message", "Donation accepted", "donationId", donationId)
         );
     }
 
+    // ================= PICKUP =================
     @PutMapping("/{donationId}/pickup")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<?> pickupDonation(@PathVariable Long donationId) {
 
-        Long driverUserId = 20L; // TEMP
-
-        donationService.pickupDonation(donationId, driverUserId);
-
-        return ResponseEntity.ok(Map.of("message", "Donation picked up", "donationId", donationId));
-    }
-
-    @PutMapping("/{donationId}/deliver")
-    public ResponseEntity<?> markAsDelivered(@PathVariable Long donationId) {
-
-        Long driverUserId = 20L; // TEMP (JWT later)
-
-        donationService.markAsDelivered(donationId, driverUserId);
+        donationService.pickupDonation(donationId, currentUserId());
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation delivered successfully",
-                        "donationId", donationId)
+                Map.of("message", "Donation picked up", "donationId", donationId)
         );
     }
 
+    // ================= DELIVER =================
+    @PutMapping("/{donationId}/deliver")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> markAsDelivered(@PathVariable Long donationId) {
 
+        donationService.markAsDelivered(donationId, currentUserId());
 
-
+        return ResponseEntity.ok(
+                Map.of("message", "Donation delivered", "donationId", donationId)
+        );
+    }
 }

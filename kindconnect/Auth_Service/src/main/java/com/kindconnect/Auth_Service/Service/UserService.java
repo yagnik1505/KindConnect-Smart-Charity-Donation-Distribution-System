@@ -7,6 +7,7 @@ import com.kindconnect.Auth_Service.Exception.*;
 import com.kindconnect.Auth_Service.Model.Role;
 import com.kindconnect.Auth_Service.Model.User;
 import com.kindconnect.Auth_Service.Repository.UserRepository;
+import com.kindconnect.Auth_Service.Security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     public void register(RegisterRequest request) {
         Role role = request.getRole();
@@ -36,14 +38,4 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void login(LoginRequest request) {
-
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-    }
 }

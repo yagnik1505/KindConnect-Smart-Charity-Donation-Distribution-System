@@ -7,8 +7,6 @@ import lombok.Data;
 @Data
 public class DriverProfileRequest {
 
-    @NotNull
-    private Long userId;
 
     @NotBlank
     private String name;

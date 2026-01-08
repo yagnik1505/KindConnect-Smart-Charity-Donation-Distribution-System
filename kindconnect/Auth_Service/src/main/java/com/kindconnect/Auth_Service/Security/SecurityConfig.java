@@ -22,10 +22,10 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())   // 🔴 REQUIRED
-                .formLogin(form -> form.disable()) // 🔴 DISABLE DEFAULT LOGIN
-                .httpBasic(basic -> basic.disable()) // 🔴 DISABLE BASIC AUTH
+//                .formLogin(form -> form.disable()) // 🔴 DISABLE DEFAULT LOGIN
+//                .httpBasic(basic -> basic.disable()) // 🔴 DISABLE BASIC AUTH
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/login","/auth/register").permitAll()
                         .anyRequest().authenticated()
                 );
 

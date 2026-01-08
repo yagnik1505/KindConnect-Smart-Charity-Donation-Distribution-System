@@ -30,11 +30,4 @@ public class UserController {
                 .body(Map.of("Message", "User registered successfully"));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
-        userService.login(request);
-        return ResponseEntity
-                .ok(Map.of("Message", "Login successful"));
-    }
-
 }

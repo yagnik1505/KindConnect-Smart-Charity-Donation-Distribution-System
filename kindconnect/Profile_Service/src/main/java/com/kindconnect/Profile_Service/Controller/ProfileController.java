@@ -7,10 +7,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
 @RestController
 @RequestMapping("/profiles")
 @RequiredArgsConstructor
@@ -18,63 +19,82 @@ public class ProfileController {
 
     private final ProfileService profileService;
 
-    // DONOR PROFILE
+    private Long currentUserId() {
+        return (Long) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+    }
+
+    // ================= DONOR =================
     @PostMapping("/donor")
+    @PreAuthorize("hasRole('DONOR')")
     public ResponseEntity<?> createDonorProfile(
-            @RequestBody @Valid DonorProfileRequest request) {
-        System.out.println("Inn");
-        profileService.createDonorProfile(request);
-        System.out.println("out");
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("Message", "Donor profile created successfully"));
+            @Valid @RequestBody DonorProfileRequest request
+    ) {
+        profileService.createDonorProfile(currentUserId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Donor profile created successfully"));
     }
 
-    // NGO PROFILE
+    @GetMapping("/donor/me")
+    @PreAuthorize("hasRole('DONOR')")
+    public ResponseEntity<?> getDonorProfile() {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.getDonorProfile(currentUserId()))
+        );
+    }
+
+    // ================= NGO =================
     @PostMapping("/ngo")
+    @PreAuthorize("hasRole('NGO')")
     public ResponseEntity<?> createNgoProfile(
-            @RequestBody @Valid NgoProfileRequest request) {
-
-        profileService.createNgoProfile(request);
-        System.out.println("out");
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("Message", "NGO profile created successfully"));
+            @Valid @RequestBody NgoProfileRequest request
+    ) {
+        profileService.createNgoProfile(currentUserId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "NGO profile created successfully"));
     }
 
-    // DRIVER PROFILE
+    @GetMapping("/ngo/me")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<?> getNgoProfile() {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.getNgoProfile(currentUserId()))
+        );
+    }
+
+    // ================= DRIVER =================
     @PostMapping("/driver")
+    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<?> createDriverProfile(
-            @RequestBody @Valid DriverProfileRequest request) {
-        System.out.println("innn");
-        profileService.createDriverProfile(request);
-        System.out.println("out");
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("Message", "Driver profile created successfully"));
+            @Valid @RequestBody DriverProfileRequest request
+    ) {
+        profileService.createDriverProfile(currentUserId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Driver profile created successfully"));
     }
 
-    // GET DONOR PROFILE
-    @GetMapping("/donor/{userId}")
-    public ResponseEntity<?> getDonorProfile(@PathVariable Long userId) {
+    @GetMapping("/driver/me")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> getDriverProfile() {
         return ResponseEntity.ok(
-                Map.of("data", profileService.getDonorProfile(userId))
+                Map.of("data", profileService.getDriverProfile(currentUserId()))
         );
     }
 
-    // GET NGO PROFILE
-    @GetMapping("/ngo/{userId}")
-    public ResponseEntity<?> getNgoProfile(@PathVariable Long userId) {
-        return ResponseEntity.ok(
-                Map.of("data", profileService.getNgoProfile(userId))
-        );
-    }
+    @PutMapping("/driver/availability")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> updateDriverAvailability(
+            @RequestParam boolean available
+    ) {
+        profileService.updateDriverAvailability(currentUserId(), available);
 
-    // GET DRIVER PROFILE
-    @GetMapping("/driver/{userId}")
-    public ResponseEntity<?> getDriverProfile(@PathVariable Long userId) {
         return ResponseEntity.ok(
-                Map.of("data", profileService.getDriverProfile(userId))
+                Map.of(
+                        "message", "Driver availability updated successfully",
+                        "available", available
+                )
         );
     }
-};
+}

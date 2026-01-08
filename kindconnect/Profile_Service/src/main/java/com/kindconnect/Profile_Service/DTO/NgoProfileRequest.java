@@ -7,8 +7,6 @@ import lombok.Data;
 @Data
 public class NgoProfileRequest {
 
-    @NotNull
-    private Long userId;
 
     @NotBlank
     private String ngoName;
