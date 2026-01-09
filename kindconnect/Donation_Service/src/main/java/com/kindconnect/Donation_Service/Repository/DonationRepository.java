@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface DonationRepository extends JpaRepository<Donation,Long> {
 
     List<Donation> findByDonorUserId(Long donorUserId);
+
+    List<Donation> findByStatus(DonationStatus donationStatus);
 }

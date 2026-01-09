@@ -31,19 +31,18 @@ public class DonationController {
     // ================= CREATE =================
     @PostMapping
     @PreAuthorize("hasRole('DONOR')")
-
     public ResponseEntity<?> createDonation(
-            @Valid @RequestBody CreateDonationRequest request
-    ) {
+            @Valid @RequestBody CreateDonationRequest request) {
 
         Donation donation =
                 donationService.createDonation(currentUserId(), request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of(
                         "message", "Donation created successfully",
                         "donationId", donation.getId()
-                ));
+                )
+        );
     }
 
     // ================= MY DONATIONS =================
@@ -55,62 +54,65 @@ public class DonationController {
         );
     }
 
-    // ================= CANCEL =================
+    // ================= DONOR CANCEL =================
     @PutMapping("/{donationId}/cancel")
     @PreAuthorize("hasRole('DONOR')")
-    public ResponseEntity<?> cancelDonation(@PathVariable Long donationId) {
+    public ResponseEntity<?> cancelDonation(
+            @PathVariable Long donationId) {
 
         donationService.cancelDonation(donationId, currentUserId());
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation cancelled", "donationId", donationId)
+                Map.of("message", "Donation cancelled")
         );
     }
 
     // ================= GET BY ID =================
     @GetMapping("/{donationId}")
     @PreAuthorize("hasAnyRole('DONOR','NGO','DRIVER')")
-    public ResponseEntity<Donation> getDonationById(
-            @PathVariable Long donationId
-    ) {
+    public ResponseEntity<Donation> getDonation(
+            @PathVariable Long donationId) {
+
         return ResponseEntity.ok(
                 donationService.getDonation(donationId)
         );
     }
 
-    // ================= ACCEPT =================
+    // ================= NGO ACCEPT =================
     @PutMapping("/{donationId}/accept")
     @PreAuthorize("hasRole('NGO')")
-    public ResponseEntity<?> acceptDonation(@PathVariable Long donationId) {
+    public ResponseEntity<?> acceptDonation(
+            @PathVariable Long donationId) {
 
-        donationService.acceptDonation(donationId, currentUserId());
+        donationService.acceptDonation(
+                donationId,
+                currentUserId()
+        );
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation accepted", "donationId", donationId)
+                Map.of("message", "Donation accepted")
         );
     }
 
-    // ================= PICKUP =================
-    @PutMapping("/{donationId}/pickup")
-    @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<?> pickupDonation(@PathVariable Long donationId) {
+    // ================= NGO CANCEL =================
+    @PutMapping("/{donationId}/cancel-by-ngo")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<?> cancelByNgo(
+            @PathVariable Long donationId) {
 
-        donationService.pickupDonation(donationId, currentUserId());
+        donationService.cancelByNgo(donationId);
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation picked up", "donationId", donationId)
+                Map.of("message", "Donation cancelled by NGO")
         );
     }
 
-    // ================= DELIVER =================
-    @PutMapping("/{donationId}/deliver")
-    @PreAuthorize("hasRole('DRIVER')")
-    public ResponseEntity<?> markAsDelivered(@PathVariable Long donationId) {
-
-        donationService.markAsDelivered(donationId, currentUserId());
-
+    // ================= AVAILABLE =================
+    @GetMapping("/available")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<List<Donation>> availableDonations() {
         return ResponseEntity.ok(
-                Map.of("message", "Donation delivered", "donationId", donationId)
+                donationService.getAvailableDonations()
         );
     }
 }

@@ -3,7 +3,7 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for Profile_Service" enabled="true">
+      <profile name="Annotation profile for Ngo_Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -12,6 +12,7 @@
         </processorPath>
         <module name="Donation_Service" />
         <module name="Profile_Service" />
+        <module name="Ngo_Service" />
         <module name="Auth_Service" />
       </profile>
     </annotationProcessing>
@@ -24,6 +25,7 @@
       <module name="Auth_Service" options="-parameters" />
       <module name="Donation_Service" options="-parameters" />
       <module name="Donor_Service" options="-parameters" />
+      <module name="Ngo_Service" options="-parameters" />
       <module name="Profile_Service" options="-parameters" />
     </option>
   </component>

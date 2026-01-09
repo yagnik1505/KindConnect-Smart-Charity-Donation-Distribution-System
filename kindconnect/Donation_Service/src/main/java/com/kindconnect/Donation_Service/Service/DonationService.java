@@ -1,6 +1,5 @@
 package com.kindconnect.Donation_Service.Service;
 
-
 import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
 import com.kindconnect.Donation_Service.Exception.DonationNotFoundException;
 import com.kindconnect.Donation_Service.Exception.InvalidDonationStateException;
@@ -19,7 +18,8 @@ public class DonationService {
 
     private final DonationRepository donationRepository;
 
-    public Donation createDonation(Long donorUserId, CreateDonationRequest request) {
+    public Donation createDonation(Long donorUserId,
+                                   CreateDonationRequest request) {
 
         Donation donation = new Donation();
         donation.setDonorUserId(donorUserId);
@@ -47,12 +47,14 @@ public class DonationService {
         Donation donation = getDonation(donationId);
 
         if (!donation.getDonorUserId().equals(donorUserId)) {
-            throw new InvalidDonationStateException("You cannot cancel this donation");
+            throw new InvalidDonationStateException(
+                    "You cannot cancel this donation"
+            );
         }
 
         if (donation.getStatus() != DonationStatus.CREATED) {
             throw new InvalidDonationStateException(
-                    "Donation cannot be cancelled after it is accepted"
+                    "Donation cannot be cancelled now"
             );
         }
 
@@ -65,43 +67,32 @@ public class DonationService {
         Donation donation = getDonation(donationId);
 
         if (donation.getStatus() != DonationStatus.CREATED) {
-            throw new InvalidDonationStateException("Donation is not available for acceptance");
+            throw new InvalidDonationStateException(
+                    "Donation is not available"
+            );
         }
 
         donation.setNgoUserId(ngoUserId);
         donation.setStatus(DonationStatus.ACCEPTED);
-
         donationRepository.save(donation);
     }
 
-    public void pickupDonation(Long donationId, Long driverUserId) {
+    public void cancelByNgo(Long donationId) {
 
         Donation donation = getDonation(donationId);
 
         if (donation.getStatus() != DonationStatus.ACCEPTED) {
-            throw new InvalidDonationStateException("Donation not accepted yet");
-        }
-
-        donation.setStatus(DonationStatus.PICKED_UP);
-        donationRepository.save(donation);
-    }
-
-    public void markAsDelivered(Long donationId, Long driverUserId) {
-
-        Donation donation = getDonation(donationId);
-
-        if (donation.getStatus() != DonationStatus.PICKED_UP) {
             throw new InvalidDonationStateException(
-                    "Cannot mark donation as DELIVERED. " +
-                            "Current status is " + donation.getStatus() +
-                            ". Expected status: PICKED_UP."
+                    "Donation cannot be cancelled by NGO"
             );
         }
 
-        donation.setStatus(DonationStatus.DELIVERED);
+        donation.setNgoUserId(null);
+        donation.setStatus(DonationStatus.CREATED);
         donationRepository.save(donation);
     }
 
-
-
+    public List<Donation> getAvailableDonations() {
+        return donationRepository.findByStatus(DonationStatus.CREATED);
+    }
 }

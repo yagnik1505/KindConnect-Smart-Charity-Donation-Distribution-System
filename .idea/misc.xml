@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/kindconnect/Profile_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Donor_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Donation_Service/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/Ngo_Service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

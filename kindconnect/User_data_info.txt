@@ -25,6 +25,12 @@ Auth_Service Info
 }
 
 {
+  "email": "ngo@test2.com",
+  "password": "password2222",
+  "role" : "NGO"
+}
+
+{
   "email": "driver@test1.com",
   "password": "password333",
   "role" : "DRIVER"
