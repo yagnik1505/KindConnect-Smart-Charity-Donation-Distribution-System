@@ -100,4 +100,27 @@ public class NgoService {
 
         return new NgoDashboardDto(total, active, cancelled);
     }
+
+    public List<NgoDonationViewDto> getMyDonationsWithLiveStatus(
+            Long ngoUserId,
+            String jwtToken
+    ) {
+        return repository.findByNgoUserId(ngoUserId)
+                .stream()
+                .map(d -> {
+                    String liveStatus =
+                            donationClient.getDonationStatus(
+                                    d.getDonationId(),
+                                    jwtToken
+                            );
+
+                    return new NgoDonationViewDto(
+                            d.getDonationId(),
+                            liveStatus,
+                            d.getAcceptedAt()
+                    );
+                })
+                .toList();
+    }
+
 }

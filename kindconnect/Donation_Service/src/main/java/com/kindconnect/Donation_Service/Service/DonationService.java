@@ -1,5 +1,6 @@
 package com.kindconnect.Donation_Service.Service;
 
+import com.kindconnect.Donation_Service.DTO.AvailableForDriverDto;
 import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
 import com.kindconnect.Donation_Service.Exception.DonationNotFoundException;
 import com.kindconnect.Donation_Service.Exception.InvalidDonationStateException;
@@ -95,4 +96,52 @@ public class DonationService {
     public List<Donation> getAvailableDonations() {
         return donationRepository.findByStatus(DonationStatus.CREATED);
     }
+
+    public List<AvailableForDriverDto> getAvailableForDriver() {
+        return donationRepository.findByStatus(DonationStatus.ACCEPTED)
+                .stream()
+                .map(d -> new AvailableForDriverDto(
+                        d.getId(),
+                        d.getItemType()
+                ))
+                .toList();
+    }
+
+    public void pickupDonation(Long donationId, Long driverUserId) {
+
+        Donation donation = getDonation(donationId);
+
+        if (donation.getStatus() != DonationStatus.ACCEPTED) {
+            throw new InvalidDonationStateException(
+                    "Donation is not ready for pickup"
+            );
+        }
+
+        donation.setStatus(DonationStatus.PICKED_UP);
+        donation.setDriverUserId(driverUserId);
+
+        donationRepository.save(donation);
+    }
+
+    public void markAsDelivered(Long donationId, Long driverUserId) {
+
+        Donation donation = getDonation(donationId);
+
+        if (donation.getStatus() != DonationStatus.PICKED_UP) {
+            throw new InvalidDonationStateException(
+                    "Donation must be PICKED_UP before delivery"
+            );
+        }
+
+        if (!donation.getDriverUserId().equals(driverUserId)) {
+            throw new InvalidDonationStateException(
+                    "Only the assigned driver can deliver this donation"
+            );
+        }
+
+        donation.setStatus(DonationStatus.DELIVERED);
+        donationRepository.save(donation);
+    }
+
+
 }

@@ -36,6 +36,18 @@ Auth_Service Info
   "role" : "DRIVER"
 }
 
+{
+  "email": "driver@test2.com",
+  "password": "password333",
+  "role" : "DRIVER"
+}
+
+{
+  "email": "driver@test3.com",
+  "password": "password333",
+  "role" : "DRIVER"
+}
+
 profiles/donor
 {
 
@@ -70,7 +82,3 @@ profile/driver
 
 http://localhost:8082/profiles/driver/availability?available=false
 // To make driver not available.
-
-
-
-

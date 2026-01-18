@@ -1,5 +1,6 @@
 package com.kindconnect.Donation_Service.Controller;
 
+import com.kindconnect.Donation_Service.DTO.AvailableForDriverDto;
 import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
 import com.kindconnect.Donation_Service.Model.Donation;
 import com.kindconnect.Donation_Service.Service.DonationService;
@@ -81,18 +82,14 @@ public class DonationController {
     // ================= NGO ACCEPT =================
     @PutMapping("/{donationId}/accept")
     @PreAuthorize("hasRole('NGO')")
-    public ResponseEntity<?> acceptDonation(
-            @PathVariable Long donationId) {
-
-        donationService.acceptDonation(
-                donationId,
-                currentUserId()
-        );
-
-        return ResponseEntity.ok(
-                Map.of("message", "Donation accepted")
-        );
+    public ResponseEntity<?> acceptDonation(@PathVariable Long donationId) {
+        donationService.acceptDonation(donationId, currentUserId());
+        return ResponseEntity.ok(Map.of(
+                "message", "Donation accepted by NGO",
+                "donationId", donationId
+        ));
     }
+
 
     // ================= NGO CANCEL =================
     @PutMapping("/{donationId}/cancel-by-ngo")
@@ -115,4 +112,40 @@ public class DonationController {
                 donationService.getAvailableDonations()
         );
     }
+
+    // Driver Availibility
+
+    @GetMapping("/available-for-driver")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<AvailableForDriverDto>> availableForDriver() {
+        return ResponseEntity.ok(donationService.getAvailableForDriver());
+    }
+
+    @PutMapping("/{donationId}/pickup")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> pickupDonation(@PathVariable Long donationId) {
+        donationService.pickupDonation(donationId, currentUserId());
+        return ResponseEntity.ok(Map.of(
+                "message", "Donation picked up",
+                "donationId", donationId
+        ));
+    }
+
+    @PutMapping("/{donationId}/deliver")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> deliverDonation(@PathVariable Long donationId) {
+
+        Long driverUserId =
+                (Long) SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+        donationService.markAsDelivered(donationId, driverUserId);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Donation delivered successfully",
+                "donationId", donationId
+        ));
+    }
+
 }

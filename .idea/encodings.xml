@@ -4,7 +4,10 @@
     <file url="file://$PROJECT_DIR$/kindconnect/Auth_Service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kindconnect/Donation_Service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kindconnect/Donor_Service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kindconnect/Driver_Service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kindconnect/Ngo_Service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/kindconnect/Profile_Service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kindconnect/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/kindconnect/service-registry-eureka/src/main/java" charset="UTF-8" />
   </component>
 </project>

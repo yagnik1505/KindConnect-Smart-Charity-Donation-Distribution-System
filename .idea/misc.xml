@@ -9,6 +9,10 @@
         <option value="$PROJECT_DIR$/kindconnect/Donor_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Donation_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Ngo_Service/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/Driver_Service/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/service-registry-eureka/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/Api-gateway/api-gateway/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

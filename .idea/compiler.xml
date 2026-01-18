@@ -3,16 +3,33 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for Ngo_Service" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="service-registry-eureka" />
+        <module name="Profile_Service" />
+        <module name="Ngo_Service" />
+      </profile>
+      <profile name="Annotation profile for Donation_Service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="Donation_Service" />
+      </profile>
+      <profile name="Annotation profile for Driver_Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
-        <module name="Donation_Service" />
-        <module name="Profile_Service" />
-        <module name="Ngo_Service" />
+        <module name="Driver_Service" />
         <module name="Auth_Service" />
       </profile>
     </annotationProcessing>
@@ -25,8 +42,11 @@
       <module name="Auth_Service" options="-parameters" />
       <module name="Donation_Service" options="-parameters" />
       <module name="Donor_Service" options="-parameters" />
+      <module name="Driver_Service" options="-parameters" />
       <module name="Ngo_Service" options="-parameters" />
       <module name="Profile_Service" options="-parameters" />
+      <module name="api-gateway" options="-parameters" />
+      <module name="service-registry-eureka" options="-parameters" />
     </option>
   </component>
 </project>

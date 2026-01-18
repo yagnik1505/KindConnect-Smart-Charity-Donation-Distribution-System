@@ -18,6 +18,9 @@ public class Donation {
     // assigned later (NGO)
     private Long ngoUserId;
 
+    // assigned when DRIVER picks up
+    private Long driverUserId;
+
     private String itemType;
     private int quantity;
     private String description;

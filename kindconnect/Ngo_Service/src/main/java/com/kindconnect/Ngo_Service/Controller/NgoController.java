@@ -43,14 +43,14 @@ public class NgoController {
         );
     }
 
-    // ================= MY DONATIONS =================
-    @GetMapping("/donations/my")
-    @PreAuthorize("hasRole('NGO')")
-    public ResponseEntity<List<NgoDonationResponseDto>> myDonations() {
-        return ResponseEntity.ok(
-                ngoService.getMyDonations(currentUserId())
-        );
-    }
+//    // ================= MY DONATIONS =================
+//    @GetMapping("/donations/my")
+//    @PreAuthorize("hasRole('NGO')")
+//    public ResponseEntity<List<NgoDonationResponseDto>> myDonations() {
+//        return ResponseEntity.ok(
+//                ngoService.getMyDonations(currentUserId())
+//        );
+//    }
 
     // ================= CANCEL =================
     @PutMapping("/donations/{donationId}/cancel")
@@ -78,4 +78,19 @@ public class NgoController {
                 ngoService.dashboard(currentUserId())
         );
     }
+
+    // Getting Live Status of Donation from DonorService.
+    @GetMapping("/donations/my")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<List<NgoDonationViewDto>> myDonations(
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                ngoService.getMyDonationsWithLiveStatus(
+                        currentUserId(),
+                        token
+                )
+        );
+    }
+
 }
