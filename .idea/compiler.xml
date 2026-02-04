@@ -11,7 +11,6 @@
         <module name="service-registry-eureka" />
         <module name="profile-service" />
         <module name="Profile_Service" />
-        <module name="Ngo_Service" />
       </profile>
       <profile name="Annotation profile for Ngo_Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -23,6 +22,7 @@
         <module name="ngo-service" />
         <module name="Donation_Service" />
         <module name="Driver_Service" />
+        <module name="Ngo_Service" />
         <module name="Auth_Service" />
       </profile>
     </annotationProcessing>

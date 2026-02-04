@@ -1,100 +1,121 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Heart } from 'lucide-react'
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
+import { login } from '../services/authService';
+import { checkProfileCompletion } from '../services/profileService';
 
-const Login = () => {
-  const navigate = useNavigate()
+export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    userType: 'donor'
-  })
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Demo: Navigate based on user type
-    if (formData.userType === 'donor') {
-      navigate('/donor')
-    } else {
-      navigate('/ngo')
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const response = await login(formData.email, formData.password);
+      
+      // Redirect to homepage and reload to update auth state
+      window.location.href = '/';
+    } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.Message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-purple-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="text-center mb-8">
-            <Heart size={48} className="mx-auto text-purple-600 mb-4" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-            <p className="text-gray-600">Login to KindConnect</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-blue-300 flex items-center justify-center p-4">
+      <div className="max-w-md w-full">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center mb-4">
+            <Heart className="h-12 w-12 text-pink-500" fill="currentColor" />
           </div>
+          <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+          <p className="text-white/90 mt-2">Sign in to continue to KindConnect</p>
+        </div>
 
+        {/* Login Form */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-3">I am a:</label>
-              <div className="flex gap-4">
-                <label className="flex-1 flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="donor"
-                    checked={formData.userType === 'donor'}
-                    onChange={(e) => setFormData({...formData, userType: e.target.value})}
-                    className="w-4 h-4 text-purple-600"
-                  />
-                  <span className="text-gray-700 font-medium">Donor</span>
-                </label>
-                <label className="flex-1 flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="ngo"
-                    checked={formData.userType === 'ngo'}
-                    onChange={(e) => setFormData({...formData, userType: e.target.value})}
-                    className="w-4 h-4 text-purple-600"
-                  />
-                  <span className="text-gray-700 font-medium">NGO</span>
-                </label>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                {error}
               </div>
-            </div>
+            )}
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
               <input
                 type="email"
-                placeholder="your.email@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                id="email"
+                name="email"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <input
                 type="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                id="password"
+                name="password"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                placeholder="••••••••"
               />
             </div>
 
-            <button type="submit" className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-bold text-lg shadow-lg">
-              Login
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-pink-500 text-white py-3 rounded-lg hover:bg-pink-600 font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-gray-600">
-            <p>Don't have an account? <a href="/register" className="text-purple-600 hover:text-purple-700 font-medium">Register here</a></p>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 text-sm">
+              Don't have an account?{' '}
+              <Link to="/auth/register" className="text-pink-500 hover:text-pink-600 font-semibold">
+                Create Account
+              </Link>
+            </p>
+          </div>
+
+          <div className="mt-4 text-center">
+            <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">
+              ← Back to Home
+            </Link>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default Login

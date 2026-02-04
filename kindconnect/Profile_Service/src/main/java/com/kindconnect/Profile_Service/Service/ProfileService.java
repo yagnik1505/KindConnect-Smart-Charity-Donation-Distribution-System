@@ -1,11 +1,23 @@
 package com.kindconnect.Profile_Service.Service;
 
-import com.kindconnect.Profile_Service.DTO.*;
-import com.kindconnect.Profile_Service.Exception.*;
-import com.kindconnect.Profile_Service.Model.*;
-import com.kindconnect.Profile_Service.Repository.*;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+
+import com.kindconnect.Profile_Service.DTO.DonorProfileRequest;
+import com.kindconnect.Profile_Service.DTO.DriverProfileRequest;
+import com.kindconnect.Profile_Service.DTO.NgoProfileRequest;
+import com.kindconnect.Profile_Service.Exception.ProfileAlreadyExistsException;
+import com.kindconnect.Profile_Service.Exception.ProfileNotFoundException;
+import com.kindconnect.Profile_Service.Model.DonorProfile;
+import com.kindconnect.Profile_Service.Model.DriverProfile;
+import com.kindconnect.Profile_Service.Model.NgoProfile;
+import com.kindconnect.Profile_Service.Model.NgoStatus;
+import com.kindconnect.Profile_Service.Repository.DonorProfileRepository;
+import com.kindconnect.Profile_Service.Repository.DriverProfileRepository;
+import com.kindconnect.Profile_Service.Repository.NgoProfileRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +73,21 @@ public class ProfileService {
         return ngoRepo.findByUserId(userId)
                 .orElseThrow(() ->
                         new ProfileNotFoundException("NGO profile not found"));
+    }
+    
+    // Get all approved NGOs (for donors to browse)
+    public List<NgoProfile> getAllApprovedNgos() {
+        return ngoRepo.findByStatus(NgoStatus.APPROVED);
+    }
+    
+    // Get all NGOs (for admin)
+    public List<NgoProfile> getAllNgos() {
+        return ngoRepo.findAll();
+    }
+    
+    // Get NGOs by city
+    public List<NgoProfile> getNgosByCity(String city) {
+        return ngoRepo.findByStatusAndCityIgnoreCase(NgoStatus.APPROVED, city);
     }
 
     // ================= DRIVER =================

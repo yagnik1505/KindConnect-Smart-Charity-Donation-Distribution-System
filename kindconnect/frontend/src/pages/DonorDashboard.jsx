@@ -1,214 +1,215 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Heart, Package, MapPin, Clock, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Gift, TrendingUp, Users, Target, Plus, Package, ArrowRight, Sparkles } from 'lucide-react';
+import { getDonorProfile } from '../services/profileService';
+import Navbar from '../components/Navbar';
 
-const DonorDashboard = () => {
-  const navigate = useNavigate()
-  const [showDonateForm, setShowDonateForm] = useState(false)
-  const [donationForm, setDonationForm] = useState({
-    itemType: '',
-    quantity: '',
-    description: '',
-    pickupAddress: '',
-    preferredDate: ''
-  })
+export default function DonorDashboard() {
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [donorLogo, setDonorLogo] = useState(null);
 
-  const donations = [
-    { id: 1, item: 'Clothes', quantity: '50 pieces', status: 'Delivered', ngo: 'Hope Foundation', date: '2025-12-15' },
-    { id: 2, item: 'Books', quantity: '100 books', status: 'In Transit', ngo: 'Education for All', date: '2025-12-18' },
-    { id: 3, item: 'Food Items', quantity: '25 kg', status: 'Pending Pickup', ngo: 'Meal Share NGO', date: '2025-12-19' }
-  ]
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-  const handleDonate = (e) => {
-    e.preventDefault()
-    alert('Donation request submitted successfully!')
-    setShowDonateForm(false)
-    setDonationForm({
-      itemType: '',
-      quantity: '',
-      description: '',
-      pickupAddress: '',
-      preferredDate: ''
-    })
+  const loadProfile = async () => {
+    // Load logo from localStorage
+    const savedLogo = localStorage.getItem('donorLogo');
+    if (savedLogo) {
+      setDonorLogo(savedLogo);
+    }
+    
+    // Try to load from cache first for instant display
+    const cachedProfile = localStorage.getItem('donorProfile');
+    if (cachedProfile) {
+      try {
+        setProfile(JSON.parse(cachedProfile));
+        setLoading(false);
+      } catch (e) {
+        // Ignore cache parse errors silently
+      }
+    }
+
+    try {
+      // Set a shorter timeout for the API call
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 3000)
+      );
+      
+      const profilePromise = getDonorProfile();
+      const response = await Promise.race([profilePromise, timeoutPromise]);
+      
+      // Cache the profile data
+      localStorage.setItem('donorProfile', JSON.stringify(response.data));
+      setProfile(response.data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      
+      // If we have cached data, use it and don't redirect
+      if (cachedProfile) {
+        return;
+      }
+      
+      // If profile doesn't exist or server error, redirect to create profile
+      if (error.response?.status === 404 || error.response?.status === 500) {
+        navigate('/profile/donor');
+      } else {
+        navigate('/');
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <a href="/" className="flex items-center text-purple-600 text-2xl font-bold hover:text-purple-700 transition">
-            <Heart className="inline mr-2" />
-            KindConnect
-          </a>
-          <div>
-            <button className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition" onClick={() => navigate('/')}>
-              <LogOut size={18} />
-              Logout
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-2xl p-8 text-white mb-8">
+          <div className="flex items-center space-x-4">
+            {donorLogo ? (
+              <img 
+                src={donorLogo} 
+                alt="Profile" 
+                className="w-16 h-16 rounded-full object-cover border-4 border-white/30 shadow-lg"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/30">
+                <User className="w-8 h-8 text-white" />
+              </div>
+            )}
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Welcome Back, {profile?.name}! 🎉</h1>
+              <p className="text-lg text-white/90">Thank you for being a part of KindConnect. Your generosity makes a difference!</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Gift className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-1">Total Donations</p>
+            <p className="text-3xl font-bold text-gray-900">0</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-1">Amount Donated</p>
+            <p className="text-3xl font-bold text-gray-900">₹0</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-1">NGOs Supported</p>
+            <p className="text-3xl font-bold text-gray-900">0</p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                <Target className="w-6 h-6 text-pink-600" />
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm mb-1">Impact Score</p>
+            <p className="text-3xl font-bold text-gray-900">0</p>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 border-pink-100">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
+            <Sparkles className="w-6 h-6 text-pink-500" />
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <button 
+              onClick={() => navigate('/donor/browse-ngos')}
+              className="group relative overflow-hidden flex items-center space-x-4 p-6 border-2 border-pink-200 rounded-2xl hover:border-pink-500 hover:shadow-lg transition-all bg-gradient-to-br from-pink-50 to-purple-50"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Plus className="w-7 h-7 text-white" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-bold text-gray-900 text-lg mb-1">Donate Now</p>
+                <p className="text-sm text-gray-600">Browse NGOs and donate items</p>
+              </div>
+              <ArrowRight className="w-6 h-6 text-pink-500 group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            <button 
+              onClick={() => navigate('/donor/donations')}
+              className="group relative overflow-hidden flex items-center space-x-4 p-6 border-2 border-blue-200 rounded-2xl hover:border-blue-500 hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-cyan-50"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Package className="w-7 h-7 text-white" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="font-bold text-gray-900 text-lg mb-1">My Donations</p>
+                <p className="text-sm text-gray-600">Track all your donations</p>
+              </div>
+              <ArrowRight className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
-      </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Donor Dashboard</h1>
-          <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium shadow-lg" onClick={() => setShowDonateForm(!showDonateForm)}>
-            <Package size={20} />
-            Make a Donation
+        {/* Profile Information */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Profile</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Name</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Phone</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.phone}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">City</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.city}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Address</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.address}</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => navigate('/profile/donor')}
+            className="mt-6 px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+          >
+            Edit Profile
           </button>
-        </div>
-
-        {showDonateForm && (
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Create Donation</h2>
-            <form onSubmit={handleDonate} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">Item Type</label>
-                  <select
-                    value={donationForm.itemType}
-                    onChange={(e) => setDonationForm({...donationForm, itemType: e.target.value})}
-                    required
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                  >
-                    <option value="">Select item type</option>
-                    <option value="clothes">Clothes</option>
-                    <option value="food">Food Items</option>
-                    <option value="books">Books</option>
-                    <option value="toys">Toys</option>
-                    <option value="furniture">Furniture</option>
-                    <option value="electronics">Electronics</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">Quantity</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., 50 pieces, 25 kg"
-                    value={donationForm.quantity}
-                    onChange={(e) => setDonationForm({...donationForm, quantity: e.target.value})}
-                    required
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Description</label>
-                <textarea
-                  placeholder="Describe the items you want to donate"
-                  value={donationForm.description}
-                  onChange={(e) => setDonationForm({...donationForm, description: e.target.value})}
-                  rows="3"
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Pickup Address</label>
-                <input
-                  type="text"
-                  placeholder="Enter pickup address"
-                  value={donationForm.pickupAddress}
-                  onChange={(e) => setDonationForm({...donationForm, pickupAddress: e.target.value})}
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Preferred Pickup Date</label>
-                <input
-                  type="date"
-                  value={donationForm.preferredDate}
-                  onChange={(e) => setDonationForm({...donationForm, preferredDate: e.target.value})}
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                />
-              </div>
-
-              <div className="flex gap-4">
-                <button type="button" className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium" onClick={() => setShowDonateForm(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium shadow-lg">
-                  Submit Donation
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-            <h3 className="text-3xl font-bold text-purple-600 mb-2">12</h3>
-            <p className="text-gray-600 font-medium">Total Donations</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-            <h3 className="text-3xl font-bold text-green-600 mb-2">8</h3>
-            <p className="text-gray-600 font-medium">Delivered</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-            <h3 className="text-3xl font-bold text-blue-600 mb-2">3</h3>
-            <p className="text-gray-600 font-medium">In Progress</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition">
-            <h3 className="text-3xl font-bold text-orange-600 mb-2">150+</h3>
-            <p className="text-gray-600 font-medium">Lives Impacted</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Donations</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b-2 border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Item</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Quantity</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">NGO</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {donations.map(donation => (
-                  <tr key={donation.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <Package size={20} className="text-purple-600" />
-                        <span className="font-medium text-gray-800">{donation.item}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-700">{donation.quantity}</td>
-                    <td className="px-6 py-4 text-gray-700">{donation.ngo}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock size={16} />
-                        <span>{donation.date}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        donation.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                        donation.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {donation.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default DonorDashboard
