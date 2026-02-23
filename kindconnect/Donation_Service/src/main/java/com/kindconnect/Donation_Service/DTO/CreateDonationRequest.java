@@ -15,4 +15,7 @@ public class CreateDonationRequest {
 
     @NotBlank
     private String description;
+
+    // Optional: if donating to a specific NGO
+    private Long targetNgoUserId;
 }

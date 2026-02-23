@@ -1,17 +1,19 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { login } from '../services/authService';
-import { checkProfileCompletion } from '../services/profileService';
 
 export default function Login() {
-  const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Get the page user was trying to access before being redirected to login
+  const from = location.state?.from?.pathname || '/';
 
   const handleChange = (e) => {
     setFormData({
@@ -27,10 +29,10 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await login(formData.email, formData.password);
+      await login(formData.email, formData.password);
       
-      // Redirect to homepage and reload to update auth state
-      window.location.href = '/';
+      // Redirect to the page they were trying to access, or homepage
+      globalThis.location.href = from;
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.Message || 'Login failed. Please check your credentials.');
     } finally {

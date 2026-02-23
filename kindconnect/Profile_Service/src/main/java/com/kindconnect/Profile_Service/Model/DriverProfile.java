@@ -1,6 +1,11 @@
 package com.kindconnect.Profile_Service.Model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import lombok.Data;
 
 @Data
@@ -17,6 +22,10 @@ public class DriverProfile {
     private String vehicleType;
     private String vehicleNumber;
     private String licenseNumber;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String logo;  // Base64 encoded profile picture
 
     private Boolean available;
 }

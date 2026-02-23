@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
 // Donor Pages
 import DonorProfilePage from './pages/DonorProfilePage';
 import DonorDashboard from './pages/DonorDashboard';
@@ -18,31 +19,53 @@ import CreateFundraiser from './pages/CreateFundraiser';
 import NgoMyFundraisers from './pages/NgoMyFundraisers';
 import BrowseFundraisers from './pages/BrowseFundraisers';
 import FundraiserDetail from './pages/FundraiserDetail';
+// Driver Pages
+import DriverProfilePage from './pages/DriverProfilePage';
+import DriverDashboard from './pages/DriverDashboard';
+import AvailablePickups from './pages/AvailablePickups';
+import MyDeliveries from './pages/MyDeliveries';
+// Admin Pages
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
-        {/* Donor Routes */}
-        <Route path="/profile/donor" element={<DonorProfilePage />} />
-        <Route path="/donor/dashboard" element={<DonorDashboard />} />
-        <Route path="/donor/create-donation" element={<CreateDonation />} />
-        <Route path="/donor/donations" element={<MyDonations />} />
-        <Route path="/donor/browse-ngos" element={<BrowseNGOs />} />
-        {/* NGO Routes */}
-        <Route path="/profile/ngo" element={<NgoProfilePage />} />
-        <Route path="/ngo/dashboard" element={<NgoDashboard />} />
-        <Route path="/ngo/available-donations" element={<NgoAvailableDonations />} />
-        <Route path="/ngo/my-donations" element={<NgoMyDonations />} />
-        {/* Fundraiser Routes */}
-        <Route path="/ngo/create-fundraiser" element={<CreateFundraiser />} />
-        <Route path="/ngo/my-fundraisers" element={<NgoMyFundraisers />} />
-        <Route path="/ngo/edit-fundraiser/:id" element={<CreateFundraiser />} />
-        <Route path="/fundraisers" element={<BrowseFundraisers />} />
-        <Route path="/fundraiser/:id" element={<FundraiserDetail />} />
+        
+        {/* Protected Donor Routes */}
+        <Route path="/profile/donor" element={<ProtectedRoute><DonorProfilePage /></ProtectedRoute>} />
+        <Route path="/donor/dashboard" element={<ProtectedRoute><DonorDashboard /></ProtectedRoute>} />
+        <Route path="/donor/create-donation" element={<ProtectedRoute><CreateDonation /></ProtectedRoute>} />
+        <Route path="/donor/donations" element={<ProtectedRoute><MyDonations /></ProtectedRoute>} />
+        <Route path="/donor/browse-ngos" element={<ProtectedRoute><BrowseNGOs /></ProtectedRoute>} />
+        <Route path="/donor/browse-fundraisers" element={<ProtectedRoute><BrowseFundraisers /></ProtectedRoute>} />
+        <Route path="/donor/fundraiser/:id" element={<ProtectedRoute><FundraiserDetail /></ProtectedRoute>} />
+        
+        {/* Protected NGO Routes */}
+        <Route path="/profile/ngo" element={<ProtectedRoute><NgoProfilePage /></ProtectedRoute>} />
+        <Route path="/ngo/dashboard" element={<ProtectedRoute><NgoDashboard /></ProtectedRoute>} />
+        <Route path="/ngo/available-donations" element={<ProtectedRoute><NgoAvailableDonations /></ProtectedRoute>} />
+        <Route path="/ngo/my-donations" element={<ProtectedRoute><NgoMyDonations /></ProtectedRoute>} />
+        
+        {/* Protected Fundraiser Routes */}
+        <Route path="/ngo/create-fundraiser" element={<ProtectedRoute><CreateFundraiser /></ProtectedRoute>} />
+        <Route path="/ngo/my-fundraisers" element={<ProtectedRoute><NgoMyFundraisers /></ProtectedRoute>} />
+        <Route path="/ngo/edit-fundraiser/:id" element={<ProtectedRoute><CreateFundraiser /></ProtectedRoute>} />
+        <Route path="/fundraisers" element={<ProtectedRoute><BrowseFundraisers /></ProtectedRoute>} />
+        <Route path="/fundraiser/:id" element={<ProtectedRoute><FundraiserDetail /></ProtectedRoute>} />
+        
+        {/* Protected Driver Routes */}
+        <Route path="/profile/driver" element={<ProtectedRoute><DriverProfilePage /></ProtectedRoute>} />
+        <Route path="/driver/dashboard" element={<ProtectedRoute><DriverDashboard /></ProtectedRoute>} />
+        <Route path="/driver/available-pickups" element={<ProtectedRoute><AvailablePickups /></ProtectedRoute>} />
+        <Route path="/driver/my-deliveries" element={<ProtectedRoute><MyDeliveries /></ProtectedRoute>} />
+        
+        {/* Protected Admin Routes */}
+        <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -22,6 +22,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints - allow NGO list for homepage display
+                        .requestMatchers("/profiles/ngo/list", "/profiles/ngo/all", "/profiles/ngo/city").permitAll()
+                        // All other profile endpoints require authentication
                         .requestMatchers("/profiles/**").authenticated()
                         .anyRequest().permitAll()
                 )

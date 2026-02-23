@@ -1,11 +1,8 @@
 package com.kindconnect.Auth_Service.Controller;
 
 
-import com.kindconnect.Auth_Service.DTO.LoginRequest;
-import com.kindconnect.Auth_Service.DTO.RegisterRequest;
-import com.kindconnect.Auth_Service.Service.UserService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import com.kindconnect.Auth_Service.DTO.RegisterRequest;
+import com.kindconnect.Auth_Service.Service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/auth")

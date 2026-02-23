@@ -1,7 +1,6 @@
 package com.kindconnect.Profile_Service.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

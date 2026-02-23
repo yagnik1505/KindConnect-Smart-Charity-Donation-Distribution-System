@@ -1,7 +1,6 @@
 package com.kindconnect.Profile_Service.DTO;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -22,4 +21,14 @@ public class NgoProfileRequest {
 
     @NotBlank
     private String city;
+    
+    private String fieldType;  // Education, Healthcare, Environment, Food, Animal, Shelter
+    private String description;
+    private String logo;  // Base64 encoded image
+
+    // Payment information (optional)
+    private String upiId;
+    private String bankAccountNumber;
+    private String ifscCode;
+    private String bankName;
 }

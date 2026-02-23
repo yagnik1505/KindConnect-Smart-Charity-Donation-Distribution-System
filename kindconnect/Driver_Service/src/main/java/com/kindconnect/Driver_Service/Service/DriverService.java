@@ -1,11 +1,14 @@
 package com.kindconnect.Driver_Service.Service;
 
-import com.kindconnect.Driver_Service.Model.DonationClient;
-import com.kindconnect.Driver_Service.DTO.AvailablePickupDto;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.kindconnect.Driver_Service.DTO.AvailablePickupDto;
+import com.kindconnect.Driver_Service.DTO.DriverDeliveryDto;
+import com.kindconnect.Driver_Service.Model.DonationClient;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +51,16 @@ public class DriverService {
 
         // 2️⃣ Record action (Stage 6)
         dashboardService.recordDelivery(driverUserId, donationId);
+    }
+
+    // ================= DRIVER DELIVERIES =================
+    // Get driver's in-transit deliveries
+    public List<DriverDeliveryDto> getInTransitDeliveries(String jwtToken) {
+        return donationClient.getInTransitDeliveries(jwtToken);
+    }
+
+    // Get driver's completed deliveries
+    public List<DriverDeliveryDto> getCompletedDeliveries(String jwtToken) {
+        return donationClient.getCompletedDeliveries(jwtToken);
     }
 }

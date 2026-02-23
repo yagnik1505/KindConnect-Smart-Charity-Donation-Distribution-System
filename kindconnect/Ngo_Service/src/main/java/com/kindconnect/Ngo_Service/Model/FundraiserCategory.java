@@ -1,0 +1,16 @@
+package com.kindconnect.Ngo_Service.Model;
+
+public enum FundraiserCategory {
+    EDUCATION,
+    HEALTHCARE,
+    FOOD_HUNGER,
+    DISASTER_RELIEF,
+    ELDERLY_CARE,
+    CHILDREN_WELFARE,
+    ANIMAL_WELFARE,
+    ENVIRONMENT,
+    WOMEN_EMPOWERMENT,
+    DISABILITY_SUPPORT,
+    COMMUNITY_DEVELOPMENT,
+    OTHER
+}

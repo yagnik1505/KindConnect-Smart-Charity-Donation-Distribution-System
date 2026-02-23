@@ -1,17 +1,25 @@
 package com.kindconnect.Driver_Service.Controller;
 
-import com.kindconnect.Driver_Service.DTO.AvailablePickupDto;
-import com.kindconnect.Driver_Service.DTO.DriverDashboardDto;
-import com.kindconnect.Driver_Service.Service.DriverDashboardService;
-import com.kindconnect.Driver_Service.Service.DriverService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.kindconnect.Driver_Service.DTO.AvailablePickupDto;
+import com.kindconnect.Driver_Service.DTO.DriverDashboardDto;
+import com.kindconnect.Driver_Service.DTO.DriverDeliveryDto;
+import com.kindconnect.Driver_Service.Service.DriverDashboardService;
+import com.kindconnect.Driver_Service.Service.DriverService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -85,6 +93,29 @@ public class DriverController {
     public DriverDashboardDto dashboard() {
         return dashboardService.getDashboard(
                 currentDriverId()
+        );
+    }
+
+    // ================= DRIVER DELIVERIES =================
+    // Get driver's in-transit deliveries
+    @GetMapping("/deliveries/in-transit")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<DriverDeliveryDto>> getInTransitDeliveries(
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                driverService.getInTransitDeliveries(token)
+        );
+    }
+
+    // Get driver's completed deliveries
+    @GetMapping("/deliveries/completed")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<DriverDeliveryDto>> getCompletedDeliveries(
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                driverService.getCompletedDeliveries(token)
         );
     }
 }

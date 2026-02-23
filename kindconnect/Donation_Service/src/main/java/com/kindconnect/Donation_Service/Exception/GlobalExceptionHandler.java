@@ -1,6 +1,10 @@
 package com.kindconnect.Donation_Service.Exception;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -9,19 +13,22 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final String MESSAGE_KEY = "message";
+    private static final String ERROR_KEY = "error";
 
     // ================= AUTHENTICATION (401) =================
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAuthenticationException(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of(
-                        "error", "Authentication required",
-                        "message", "Please login to access this resource"
+                        ERROR_KEY, "Authentication required",
+                        MESSAGE_KEY, "Please login to access this resource"
                 ));
     }
 
@@ -30,8 +37,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of(
-                        "error", "Access denied",
-                        "message", "You are not allowed to perform this action"
+                        ERROR_KEY, "Access denied",
+                        MESSAGE_KEY, "You are not allowed to perform this action"
                 ));
     }
 
@@ -40,8 +47,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleDonationNotFound(DonationNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of(
-                        "error", "Donation not found",
-                        "message", ex.getMessage()
+                        ERROR_KEY, "Donation not found",
+                        MESSAGE_KEY, ex.getMessage()
                 ));
     }
 
@@ -50,8 +57,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidDonationState(InvalidDonationStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
-                        "error", "Invalid donation state",
-                        "message", ex.getMessage()
+                        ERROR_KEY, "Invalid donation state",
+                        MESSAGE_KEY, ex.getMessage()
                 ));
     }
 
@@ -66,7 +73,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of(
-                        "error", "Validation failed",
+                        ERROR_KEY, "Validation failed",
                         "fields", errors
                 ));
     }
@@ -75,12 +82,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex, HttpServletRequest request) {
 
-        ex.printStackTrace(); // keep for logs
+        logger.error("Unexpected error occurred", ex);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of(
-                        "error", "Internal server error",
-                        "message", "Something went wrong"
+                        ERROR_KEY, "Internal server error",
+                        MESSAGE_KEY, "Something went wrong"
                 ));
     }
 }

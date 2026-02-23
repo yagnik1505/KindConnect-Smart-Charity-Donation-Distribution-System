@@ -1,10 +1,12 @@
         package com.kindconnect.Profile_Service.Model;
 
+        import jakarta.persistence.Column;
         import jakarta.persistence.Entity;
-        import jakarta.persistence.GeneratedValue;
-        import jakarta.persistence.GenerationType;
-        import jakarta.persistence.Id;
-        import lombok.Data;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import lombok.Data;
 
         @Data
         @Entity
@@ -19,5 +21,9 @@
             private String phone;
             private String address;
             private String city;
+
+            @Lob
+            @Column(columnDefinition = "TEXT")
+            private String logo;  // Base64 encoded profile picture
 
         }

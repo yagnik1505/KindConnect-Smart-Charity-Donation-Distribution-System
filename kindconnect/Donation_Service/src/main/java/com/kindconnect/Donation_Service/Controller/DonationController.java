@@ -1,24 +1,37 @@
 package com.kindconnect.Donation_Service.Controller;
 
-import com.kindconnect.Donation_Service.DTO.AvailableForDriverDto;
-import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
-import com.kindconnect.Donation_Service.Model.Donation;
-import com.kindconnect.Donation_Service.Service.DonationService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.kindconnect.Donation_Service.DTO.AvailableForDriverDto;
+import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
+import com.kindconnect.Donation_Service.DTO.DriverDeliveryDto;
+import com.kindconnect.Donation_Service.Model.Donation;
+import com.kindconnect.Donation_Service.Service.DonationService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/donations")
 @RequiredArgsConstructor
 public class DonationController {
+
+    private static final String MESSAGE_KEY = "message";
+    private static final String DONATION_ID_KEY = "donationId";
 
     private final DonationService donationService;
 
@@ -40,8 +53,8 @@ public class DonationController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of(
-                        "message", "Donation created successfully",
-                        "donationId", donation.getId()
+                        MESSAGE_KEY, "Donation created successfully",
+                        DONATION_ID_KEY, donation.getId()
                 )
         );
     }
@@ -64,7 +77,7 @@ public class DonationController {
         donationService.cancelDonation(donationId, currentUserId());
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation cancelled")
+                Map.of(MESSAGE_KEY, "Donation cancelled")
         );
     }
 
@@ -85,8 +98,8 @@ public class DonationController {
     public ResponseEntity<?> acceptDonation(@PathVariable Long donationId) {
         donationService.acceptDonation(donationId, currentUserId());
         return ResponseEntity.ok(Map.of(
-                "message", "Donation accepted by NGO",
-                "donationId", donationId
+                MESSAGE_KEY, "Donation accepted by NGO",
+                DONATION_ID_KEY, donationId
         ));
     }
 
@@ -100,7 +113,7 @@ public class DonationController {
         donationService.cancelByNgo(donationId);
 
         return ResponseEntity.ok(
-                Map.of("message", "Donation cancelled by NGO")
+                Map.of(MESSAGE_KEY, "Donation cancelled by NGO")
         );
     }
 
@@ -109,7 +122,7 @@ public class DonationController {
     @PreAuthorize("hasRole('NGO')")
     public ResponseEntity<List<Donation>> availableDonations() {
         return ResponseEntity.ok(
-                donationService.getAvailableDonations()
+                donationService.getAvailableDonations(currentUserId())
         );
     }
 
@@ -126,8 +139,8 @@ public class DonationController {
     public ResponseEntity<?> pickupDonation(@PathVariable Long donationId) {
         donationService.pickupDonation(donationId, currentUserId());
         return ResponseEntity.ok(Map.of(
-                "message", "Donation picked up",
-                "donationId", donationId
+                MESSAGE_KEY, "Donation picked up",
+                DONATION_ID_KEY, donationId
         ));
     }
 
@@ -143,9 +156,31 @@ public class DonationController {
         donationService.markAsDelivered(donationId, driverUserId);
 
         return ResponseEntity.ok(Map.of(
-                "message", "Donation delivered successfully",
-                "donationId", donationId
+                MESSAGE_KEY, "Donation delivered successfully",
+                DONATION_ID_KEY, donationId
         ));
+    }
+
+    // Get driver's in-transit deliveries
+    @GetMapping("/driver/in-transit")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<DriverDeliveryDto>> getDriverInTransitDeliveries(
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                donationService.getDriverInTransitDeliveries(currentUserId(), token)
+        );
+    }
+
+    // Get driver's completed deliveries
+    @GetMapping("/driver/completed")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<List<DriverDeliveryDto>> getDriverCompletedDeliveries(
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(
+                donationService.getDriverCompletedDeliveries(currentUserId(), token)
+        );
     }
 
 }

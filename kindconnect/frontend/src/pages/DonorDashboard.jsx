@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Gift, TrendingUp, Users, Target, Plus, Package, ArrowRight, Sparkles } from 'lucide-react';
+import { User, Gift, TrendingUp, Target, Package, ArrowRight, Sparkles, Flame, Trophy, Star } from 'lucide-react';
 import { getDonorProfile } from '../services/profileService';
+import { getImpactStats } from '../services/fundraiserService';
 import Navbar from '../components/Navbar';
 
 export default function DonorDashboard() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [donorLogo, setDonorLogo] = useState(null);
 
   useEffect(() => {
     loadProfile();
+    loadImpactStats();
   }, []);
 
   const loadProfile = async () => {
@@ -62,6 +65,16 @@ export default function DonorDashboard() {
     }
   };
 
+  const loadImpactStats = async () => {
+    try {
+      const data = await getImpactStats();
+      setStats(data);
+    } catch (error) {
+      // Silently fail - stats are optional
+      console.log('Could not load impact stats');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -95,119 +108,212 @@ export default function DonorDashboard() {
               </div>
             )}
             <div>
-              <h1 className="text-4xl font-bold mb-2">Welcome Back, {profile?.name}! 🎉</h1>
-              <p className="text-lg text-white/90">Thank you for being a part of KindConnect. Your generosity makes a difference!</p>
+              <h1 className="text-3xl font-bold">Welcome back{profile?.name ? `, ${profile.name}` : ''}!</h1>
+              <p className="text-pink-100 mt-1">Continue making a difference today</p>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Gift className="w-6 h-6 text-blue-600" />
+        {/* Impact Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Gift className="w-5 h-5" />
               </div>
+              <span className="text-xs bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">All Time</span>
             </div>
-            <p className="text-gray-600 text-sm mb-1">Total Donations</p>
-            <p className="text-3xl font-bold text-gray-900">0</p>
+            <p className="text-purple-100 text-sm mb-1">Total Donations</p>
+            <p className="text-4xl font-bold">{stats?.totalDonations || 0}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+          <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <TrendingUp className="w-5 h-5" />
               </div>
+              {stats?.overallRank && (
+                <span className="text-xs bg-white/20 px-2 py-1 rounded-full backdrop-blur-sm">
+                  Rank #{stats.overallRank}
+                </span>
+              )}
             </div>
-            <p className="text-gray-600 text-sm mb-1">Amount Donated</p>
-            <p className="text-3xl font-bold text-gray-900">₹0</p>
+            <p className="text-pink-100 text-sm mb-1">Amount Donated</p>
+            <p className="text-4xl font-bold">₹{stats?.totalAmountDonated?.toLocaleString() || 0}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-purple-600" />
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Target className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-gray-600 text-sm mb-1">NGOs Supported</p>
-            <p className="text-3xl font-bold text-gray-900">0</p>
+            <p className="text-blue-100 text-sm mb-1">Campaigns Supported</p>
+            <p className="text-4xl font-bold">{stats?.fundraisersSupported || 0}</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-pink-600" />
+          <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Flame className="w-5 h-5" />
               </div>
             </div>
-            <p className="text-gray-600 text-sm mb-1">Impact Score</p>
-            <p className="text-3xl font-bold text-gray-900">0</p>
+            <p className="text-orange-100 text-sm mb-1">Month Streak</p>
+            <p className="text-4xl font-bold">{stats?.consecutiveDonationStreak || 0}</p>
           </div>
+
         </div>
+
+        {/* Achievement Badges - Top Unlocked */}
+        {stats?.badges && stats.badges.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-6 h-6 text-yellow-500" />
+                <h2 className="text-xl font-bold text-gray-900">Your Achievements</h2>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-4 gap-4">
+              {stats.badges.slice(0, 4).map((badge, index) => (
+                <div 
+                  key={badge.id}
+                  className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border-2 border-gray-200 hover:border-purple-300 transition-all group"
+                >
+                  <div className="text-center">
+                    <div className="text-4xl mb-2 transform group-hover:scale-110 transition-transform" style={{ filter: 'drop-shadow(0 0 8px rgba(0,0,0,0.1))' }}>
+                      {badge.icon}
+                    </div>
+                    <h3 className="font-bold text-gray-800 text-sm mb-1">{badge.name}</h3>
+                    <p className="text-xs text-gray-600 mb-2">{badge.description}</p>
+                    <div className="h-1.5 bg-gray-300 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all"
+                        style={{ 
+                          width: `${Math.min((badge.progress / badge.target) * 100, 100)}%`,
+                          background: badge.color
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{badge.progress}/{badge.target}</p>
+                  </div>
+                  {badge.progress >= badge.target && (
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                      <Star className="w-3 h-3 text-white fill-current" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 border-pink-100">
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Quick Actions</h2>
             <Sparkles className="w-6 h-6 text-pink-500" />
           </div>
           <div className="grid md:grid-cols-2 gap-4">
-            <button 
-              onClick={() => navigate('/donor/browse-ngos')}
-              className="group relative overflow-hidden flex items-center space-x-4 p-6 border-2 border-pink-200 rounded-2xl hover:border-pink-500 hover:shadow-lg transition-all bg-gradient-to-br from-pink-50 to-purple-50"
+            <button
+              onClick={() => navigate('/fundraisers')}
+              className="group bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <Plus className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-between">
+                <div className="text-left flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-4">
+                    <Gift className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="font-bold text-gray-900 text-lg mb-1">Browse Fundraisers</p>
+                  <p className="text-sm text-gray-600">Discover causes to support</p>
+                </div>
+                <ArrowRight className="w-6 h-6 text-purple-500 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-left flex-1">
-                <p className="font-bold text-gray-900 text-lg mb-1">Donate Now</p>
-                <p className="text-sm text-gray-600">Browse NGOs and donate items</p>
-              </div>
-              <ArrowRight className="w-6 h-6 text-pink-500 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            <button 
-              onClick={() => navigate('/donor/donations')}
-              className="group relative overflow-hidden flex items-center space-x-4 p-6 border-2 border-blue-200 rounded-2xl hover:border-blue-500 hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-cyan-50"
+            <button
+              onClick={() => navigate('/donor/create-donation')}
+              className="group bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all"
             >
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <Package className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-between">
+                <div className="text-left flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center mb-4">
+                    <Package className="w-6 h-6 text-white" />
+                  </div>
+                  <p className="font-bold text-gray-900 text-lg mb-1">Donate Items</p>
+                  <p className="text-sm text-gray-600">Give items to those in need</p>
+                </div>
+                <ArrowRight className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform" />
               </div>
-              <div className="text-left flex-1">
-                <p className="font-bold text-gray-900 text-lg mb-1">My Donations</p>
-                <p className="text-sm text-gray-600">Track all your donations</p>
-              </div>
-              <ArrowRight className="w-6 h-6 text-blue-500 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
 
-        {/* Profile Information */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Profile</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Name</p>
-              <p className="text-lg font-semibold text-gray-900">{profile?.name}</p>
+        {/* Recent Impact (if available) */}
+        {stats?.recentImpacts && stats.recentImpacts.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Recent Impact</h2>
+              <button
+                onClick={() => navigate('/fundraisers')}
+                className="text-sm text-purple-600 hover:text-purple-700 font-medium flex items-center gap-1"
+              >
+                View More
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Phone</p>
-              <p className="text-lg font-semibold text-gray-900">{profile?.phone}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">City</p>
-              <p className="text-lg font-semibold text-gray-900">{profile?.city}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Address</p>
-              <p className="text-lg font-semibold text-gray-900">{profile?.address}</p>
+            <div className="space-y-3">
+              {stats.recentImpacts.slice(0, 3).map((impact) => (
+                <button
+                  key={impact.fundraiserId}
+                  onClick={() => navigate(`/donor/fundraiser/${impact.fundraiserId}`)}
+                  className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-transparent rounded-xl hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0">
+                    ₹
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-800 truncate">{impact.fundraiserTitle}</h3>
+                    <p className="text-sm text-green-600 font-medium">{impact.impactMessage}</p>
+                    <p className="text-xs text-gray-500">{impact.date}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-purple-600">₹{impact.amount.toLocaleString()}</p>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
-          <button 
-            onClick={() => navigate('/profile/donor')}
-            className="mt-6 px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
-          >
-            Edit Profile
-          </button>
+        )}
+
+        {/* Profile Information */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Your Profile</h2>
+            <button 
+              onClick={() => navigate('/profile/donor')}
+              className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all font-medium"
+            >
+              Edit Profile
+            </button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-purple-50 to-transparent p-4 rounded-xl">
+              <p className="text-sm text-gray-600 mb-1">Name</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.name || 'N/A'}</p>
+            </div>
+            <div className="bg-gradient-to-br from-pink-50 to-transparent p-4 rounded-xl">
+              <p className="text-sm text-gray-600 mb-1">Phone</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.phone || 'N/A'}</p>
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-transparent p-4 rounded-xl">
+              <p className="text-sm text-gray-600 mb-1">City</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.city || 'N/A'}</p>
+            </div>
+            <div className="bg-gradient-to-br from-orange-50 to-transparent p-4 rounded-xl">
+              <p className="text-sm text-gray-600 mb-1">Address</p>
+              <p className="text-lg font-semibold text-gray-900">{profile?.address || 'N/A'}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

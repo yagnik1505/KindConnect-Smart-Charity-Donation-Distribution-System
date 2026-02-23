@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProfileController {
 
+    private static final String MESSAGE_KEY = "message";
+
     private final ProfileService profileService;
 
     private Long currentUserId() {
@@ -35,15 +38,15 @@ public class ProfileController {
                     .getAuthentication()
                     .getPrincipal();
             
-            if (principal instanceof Long) {
-                return (Long) principal;
-            } else if (principal instanceof String) {
-                return Long.parseLong((String) principal);
+            if (principal instanceof Long userId) {
+                return userId;
+            } else if (principal instanceof String userIdStr) {
+                return Long.parseLong(userIdStr);
             } else {
-                throw new RuntimeException("Invalid principal type: " + principal.getClass().getName());
+                throw new IllegalStateException("Invalid principal type: " + (principal != null ? principal.getClass().getName() : "null"));
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to extract user ID from security context: " + e.getMessage(), e);
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("Failed to extract user ID from security context: " + e.getMessage(), e);
         }
     }
 
@@ -55,7 +58,7 @@ public class ProfileController {
     ) {
         profileService.createDonorProfile(currentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Donor profile created successfully"));
+                .body(Map.of(MESSAGE_KEY, "Donor profile created successfully"));
     }
 
     @GetMapping("/donor/me")
@@ -63,6 +66,16 @@ public class ProfileController {
     public ResponseEntity<?> getDonorProfile() {
         return ResponseEntity.ok(
                 Map.of("data", profileService.getDonorProfile(currentUserId()))
+        );
+    }
+
+    @PutMapping("/donor/me")
+    @PreAuthorize("hasRole('DONOR')")
+    public ResponseEntity<?> updateDonorProfile(
+            @Valid @RequestBody DonorProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.updateDonorProfile(currentUserId(), request))
         );
     }
 
@@ -74,7 +87,7 @@ public class ProfileController {
     ) {
         profileService.createNgoProfile(currentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "NGO profile created successfully"));
+                .body(Map.of(MESSAGE_KEY, "NGO profile created successfully"));
     }
 
     @GetMapping("/ngo/me")
@@ -82,6 +95,16 @@ public class ProfileController {
     public ResponseEntity<?> getNgoProfile() {
         return ResponseEntity.ok(
                 Map.of("data", profileService.getNgoProfile(currentUserId()))
+        );
+    }
+
+    @PutMapping("/ngo/me")
+    @PreAuthorize("hasRole('NGO')")
+    public ResponseEntity<?> updateNgoProfile(
+            @Valid @RequestBody NgoProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.updateNgoProfile(currentUserId(), request))
         );
     }
     
@@ -108,6 +131,14 @@ public class ProfileController {
                 Map.of("data", profileService.getNgosByCity(city))
         );
     }
+    
+    // Get NGO by profile ID (for detail page)
+    @GetMapping("/ngo/{id}")
+    public ResponseEntity<?> getNgoById(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.getNgoById(id))
+        );
+    }
 
     // ================= DRIVER =================
     @PostMapping("/driver")
@@ -117,7 +148,7 @@ public class ProfileController {
     ) {
         profileService.createDriverProfile(currentUserId(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Driver profile created successfully"));
+                .body(Map.of(MESSAGE_KEY, "Driver profile created successfully"));
     }
 
     @GetMapping("/driver/me")
@@ -125,6 +156,16 @@ public class ProfileController {
     public ResponseEntity<?> getDriverProfile() {
         return ResponseEntity.ok(
                 Map.of("data", profileService.getDriverProfile(currentUserId()))
+        );
+    }
+
+    @PutMapping("/driver/me")
+    @PreAuthorize("hasRole('DRIVER')")
+    public ResponseEntity<?> updateDriverProfile(
+            @Valid @RequestBody DriverProfileRequest request
+    ) {
+        return ResponseEntity.ok(
+                Map.of("data", profileService.updateDriverProfile(currentUserId(), request))
         );
     }
 
@@ -137,9 +178,102 @@ public class ProfileController {
 
         return ResponseEntity.ok(
                 Map.of(
-                        "message", "Driver availability updated successfully",
+                        MESSAGE_KEY, "Driver availability updated successfully",
                         "available", available
                 )
         );
+    }
+
+    // ================= INTER-SERVICE ENDPOINTS =================
+    // Get NGO profile by userId (for other services)
+    @GetMapping("/ngo/user/{userId}")
+    public ResponseEntity<?> getNgoProfileByUserId(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(
+                    Map.of("data", profileService.getNgoProfile(userId))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Get Donor profile by userId (for other services)
+    @GetMapping("/donor/user/{userId}")
+    public ResponseEntity<?> getDonorProfileByUserId(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(
+                    Map.of("data", profileService.getDonorProfile(userId))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Get Driver profile by userId (for other services)
+    @GetMapping("/driver/user/{userId}")
+    public ResponseEntity<?> getDriverProfileByUserId(@PathVariable Long userId) {
+        try {
+            return ResponseEntity.ok(
+                    Map.of("data", profileService.getDriverProfile(userId))
+            );
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // ================= ADMIN ENDPOINTS =================
+    // Get all NGOs including pending/rejected
+    @GetMapping("/ngos")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllNgosForAdmin() {
+        return ResponseEntity.ok(profileService.getAllNgosIncludingPending());
+    }
+    
+    // Update NGO status (approve/reject)
+    @PutMapping("/ngo/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateNgoStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request
+    ) {
+        try {
+            String status = request.get("status");
+            if (status == null || status.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Status is required"));
+            }
+            
+            profileService.updateNgoStatus(id, status);
+            return ResponseEntity.ok(
+                    Map.of(MESSAGE_KEY, "NGO status updated successfully")
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    // Update NGO rating
+    @PutMapping("/ngo/{id}/rating")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateNgoRating(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> request
+    ) {
+        try {
+            Integer rating = request.get("rating");
+            if (rating == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Rating is required"));
+            }
+            
+            profileService.updateNgoRating(id, rating);
+            return ResponseEntity.ok(
+                    Map.of(MESSAGE_KEY, "NGO rating updated successfully")
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

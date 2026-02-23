@@ -1,23 +1,29 @@
 package com.kindconnect.Donation_Service.Service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.kindconnect.Donation_Service.Client.ProfileClient;
 import com.kindconnect.Donation_Service.DTO.AvailableForDriverDto;
 import com.kindconnect.Donation_Service.DTO.CreateDonationRequest;
+import com.kindconnect.Donation_Service.DTO.DriverDeliveryDto;
 import com.kindconnect.Donation_Service.Exception.DonationNotFoundException;
 import com.kindconnect.Donation_Service.Exception.InvalidDonationStateException;
 import com.kindconnect.Donation_Service.Model.Donation;
 import com.kindconnect.Donation_Service.Model.DonationStatus;
 import com.kindconnect.Donation_Service.Repository.DonationRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class DonationService {
 
     private final DonationRepository donationRepository;
+    private final ProfileClient profileClient;
 
     public Donation createDonation(Long donorUserId,
                                    CreateDonationRequest request) {
@@ -27,6 +33,7 @@ public class DonationService {
         donation.setItemType(request.getItemType());
         donation.setQuantity(request.getQuantity());
         donation.setDescription(request.getDescription());
+        donation.setTargetNgoUserId(request.getTargetNgoUserId()); // Set target NGO if specified
         donation.setStatus(DonationStatus.CREATED);
         donation.setCreatedAt(LocalDateTime.now());
 
@@ -93,8 +100,9 @@ public class DonationService {
         donationRepository.save(donation);
     }
 
-    public List<Donation> getAvailableDonations() {
-        return donationRepository.findByStatus(DonationStatus.CREATED);
+    public List<Donation> getAvailableDonations(Long ngoUserId) {
+        // Returns donations that are either general (no target) OR targeted to this specific NGO
+        return donationRepository.findAvailableDonationsForNgo(DonationStatus.CREATED, ngoUserId);
     }
 
     public List<AvailableForDriverDto> getAvailableForDriver() {
@@ -119,6 +127,7 @@ public class DonationService {
 
         donation.setStatus(DonationStatus.PICKED_UP);
         donation.setDriverUserId(driverUserId);
+        donation.setPickedUpAt(LocalDateTime.now());
 
         donationRepository.save(donation);
     }
@@ -140,8 +149,63 @@ public class DonationService {
         }
 
         donation.setStatus(DonationStatus.DELIVERED);
+        donation.setDeliveredAt(LocalDateTime.now());
         donationRepository.save(donation);
     }
 
+    // Get driver's in-transit deliveries (PICKED_UP status)
+    public List<DriverDeliveryDto> getDriverInTransitDeliveries(Long driverUserId, String jwtToken) {
+        return donationRepository.findByDriverUserIdAndStatus(driverUserId, DonationStatus.PICKED_UP)
+                .stream()
+                .map(d -> mapToDriverDeliveryDto(d, jwtToken))
+                .toList();
+    }
+
+    // Get driver's completed deliveries (DELIVERED status)
+    public List<DriverDeliveryDto> getDriverCompletedDeliveries(Long driverUserId, String jwtToken) {
+        return donationRepository.findByDriverUserIdAndStatus(driverUserId, DonationStatus.DELIVERED)
+                .stream()
+                .map(d -> mapToDriverDeliveryDto(d, jwtToken))
+                .toList();
+    }
+
+    // Helper method to map Donation to DriverDeliveryDto with profile details
+    private DriverDeliveryDto mapToDriverDeliveryDto(Donation d, String jwtToken) {
+        DriverDeliveryDto dto = new DriverDeliveryDto();
+        dto.setDonationId(d.getId());
+        dto.setItemType(d.getItemType());
+        dto.setQuantity(d.getQuantity());
+        dto.setDescription(d.getDescription());
+        dto.setStatus(d.getStatus());
+        dto.setCreatedAt(d.getCreatedAt());
+        dto.setPickedUpAt(d.getPickedUpAt());
+        dto.setDeliveredAt(d.getDeliveredAt());
+        dto.setDonorUserId(d.getDonorUserId());
+        dto.setNgoUserId(d.getNgoUserId());
+
+        // Fetch NGO profile details
+        if (d.getNgoUserId() != null) {
+            Map<String, Object> ngoProfile = profileClient.getNgoProfileByUserId(d.getNgoUserId(), jwtToken);
+            if (ngoProfile != null) {
+                dto.setNgoName((String) ngoProfile.get("ngoName"));
+                dto.setNgoAddress((String) ngoProfile.get("address"));
+                dto.setNgoCity((String) ngoProfile.get("city"));
+                dto.setNgoPhone((String) ngoProfile.get("phone"));
+            }
+        }
+
+        // Fetch Donor profile details
+        if (d.getDonorUserId() != null) {
+            Map<String, Object> donorProfile = profileClient.getDonorProfileByUserId(d.getDonorUserId(), jwtToken);
+            if (donorProfile != null) {
+                dto.setDonorName((String) donorProfile.get("name"));
+                dto.setDonorAddress((String) donorProfile.get("address"));
+                dto.setDonorCity((String) donorProfile.get("city"));
+                dto.setDonorPhone((String) donorProfile.get("phone"));
+            }
+        }
+
+        return dto;
+    }
 
 }
