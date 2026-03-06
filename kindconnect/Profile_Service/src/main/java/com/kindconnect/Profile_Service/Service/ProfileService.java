@@ -234,6 +234,30 @@ public class ProfileService {
     }
 
     // ================= ADMIN =================
+    // Get all drivers (for admin dashboard)
+    public List<DriverProfile> getAllDrivers() {
+        return driverRepo.findAll();
+    }
+
+    // Toggle driver availability (admin only)
+    public void adminToggleDriverAvailability(Long driverId, boolean available) {
+        DriverProfile driver = driverRepo.findById(driverId)
+                .orElseThrow(() -> new ProfileNotFoundException(DRIVER_PROFILE_NOT_FOUND));
+        driver.setAvailable(available);
+        driverRepo.save(driver);
+    }
+
+    // Update driver rating (admin only)
+    public void updateDriverRating(Long driverId, Integer rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        DriverProfile driver = driverRepo.findById(driverId)
+                .orElseThrow(() -> new ProfileNotFoundException(DRIVER_PROFILE_NOT_FOUND));
+        driver.setRating(rating);
+        driverRepo.save(driver);
+    }
+
     // Get all NGOs including pending/rejected (for admin dashboard)
     public List<NgoProfile> getAllNgosIncludingPending() {
         List<NgoProfile> ngos = ngoRepo.findAll();

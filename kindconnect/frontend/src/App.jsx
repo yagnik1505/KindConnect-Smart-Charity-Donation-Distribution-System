@@ -26,6 +26,7 @@ import AvailablePickups from './pages/AvailablePickups';
 import MyDeliveries from './pages/MyDeliveries';
 // Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
+import AdminDriverDashboard from './pages/AdminDriverDashboard';
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
         
         {/* Protected Admin Routes */}
         <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+        <Route path="/admin/drivers" element={<ProtectedRoute><AdminDriverDashboard /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

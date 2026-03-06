@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Heart, LogOut, Menu, X, Home, Package, PlusCircle, List, User, Bell, Target, Building2, Shield } from 'lucide-react';
+import { Heart, LogOut, Menu, X, Home, Package, PlusCircle, List, User, Bell, Target, Building2, Shield, Truck } from 'lucide-react';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -132,7 +132,8 @@ export default function Navbar() {
     if (userRole === 'ADMIN') {
       return [
         { path: '/', label: 'Home', icon: Home },
-        { path: '/admin/dashboard', label: 'Admin Dashboard', icon: Building2 },
+        { path: '/admin/dashboard', label: 'NGO Management', icon: Building2 },
+        { path: '/admin/drivers', label: 'Driver Management', icon: Truck },
       ];
     } else if (userRole === 'NGO') {
       return [

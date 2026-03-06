@@ -96,7 +96,7 @@ export default function BrowseFundraisers() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50">
       <Navbar />
 
       {/* Hero Section */}
@@ -122,7 +122,7 @@ export default function BrowseFundraisers() {
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
               >
                 Search
               </button>
@@ -179,12 +179,12 @@ export default function BrowseFundraisers() {
                       return (
                         <>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="font-semibold text-pink-600">₹{raised.toLocaleString()}</span>
+                            <span className="font-semibold text-rose-600">₹{raised.toLocaleString()}</span>
                             <span className="text-gray-500">of ₹{(fundraiser.targetAmount || 0).toLocaleString()}</span>
                           </div>
                           <div className="h-2 bg-gray-200 rounded-full">
                             <div 
-                              className="h-full bg-gradient-to-r from-red-500 to-pink-500 rounded-full"
+                              className="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 rounded-full"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -192,7 +192,7 @@ export default function BrowseFundraisers() {
                       );
                     })()}
                   </div>
-                  <button className="w-full py-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                  <button className="w-full py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
                     Donate Now
                   </button>
                 </div>
@@ -212,7 +212,7 @@ export default function BrowseFundraisers() {
                 onClick={() => handleCategoryChange(cat.value)}
                 className={`flex items-center space-x-2 px-5 py-3 rounded-xl font-medium transition-all whitespace-nowrap ${
                   selectedCategory === cat.value
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white shadow-lg shadow-pink-300/30'
                     : 'bg-white text-gray-700 hover:bg-gray-50 shadow'
                 }`}
               >
@@ -245,20 +245,20 @@ export default function BrowseFundraisers() {
 
         {/* Error */}
         {error && (
-          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl">
+            <p className="text-rose-800">{error}</p>
           </div>
         )}
 
         {/* Loading */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-pink-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-rose-500"></div>
           </div>
         ) : fundraisers.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-10 h-10 text-pink-600" />
+            <div className="w-20 h-20 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Target className="w-10 h-10 text-rose-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">No fundraisers found</h3>
             <p className="text-gray-600">Try a different search or category</p>
@@ -312,12 +312,12 @@ export default function BrowseFundraisers() {
                       return (
                         <>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="font-bold text-pink-600">₹{raised.toLocaleString()}</span>
+                            <span className="font-bold text-rose-600">₹{raised.toLocaleString()}</span>
                             <span className="text-gray-500">raised of ₹{(fundraiser.targetAmount || 0).toLocaleString()}</span>
                           </div>
                           <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                             <div 
-                              className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all"
+                              className="h-full bg-gradient-to-r from-pink-500 via-rose-500 to-purple-500 rounded-full transition-all"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -342,7 +342,7 @@ export default function BrowseFundraisers() {
                   </div>
 
                   {/* Donate Button */}
-                  <button className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center justify-center">
+                  <button className="w-full py-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg shadow-pink-300/30 transition-all flex items-center justify-center">
                     <Heart className="w-5 h-5 mr-2" />
                     Donate Now
                   </button>

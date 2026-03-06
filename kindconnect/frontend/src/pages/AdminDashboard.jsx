@@ -177,7 +177,7 @@ export default function AdminDashboard() {
               <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900">NGO Management</h1>
               <p className="text-gray-600">Manage NGO applications and ratings</p>
             </div>
           </div>

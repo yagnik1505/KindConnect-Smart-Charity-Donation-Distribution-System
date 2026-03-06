@@ -228,6 +228,59 @@ public class ProfileController {
     public ResponseEntity<?> getAllNgosForAdmin() {
         return ResponseEntity.ok(profileService.getAllNgosIncludingPending());
     }
+
+    // Get all drivers (for admin)
+    @GetMapping("/drivers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllDriversForAdmin() {
+        return ResponseEntity.ok(profileService.getAllDrivers());
+    }
+
+    // Toggle driver availability (admin)
+    @PutMapping("/driver/{id}/availability")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> adminToggleDriverAvailability(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> request
+    ) {
+        try {
+            Boolean available = request.get("available");
+            if (available == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Available field is required"));
+            }
+            profileService.adminToggleDriverAvailability(id, available);
+            return ResponseEntity.ok(
+                    Map.of(MESSAGE_KEY, "Driver availability updated successfully")
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // Update driver rating (admin)
+    @PutMapping("/driver/{id}/rating")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateDriverRating(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> request
+    ) {
+        try {
+            Integer rating = request.get("rating");
+            if (rating == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Rating is required"));
+            }
+            profileService.updateDriverRating(id, rating);
+            return ResponseEntity.ok(
+                    Map.of(MESSAGE_KEY, "Driver rating updated successfully")
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
     
     // Update NGO status (approve/reject)
     @PutMapping("/ngo/{id}/status")

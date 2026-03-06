@@ -28,4 +28,6 @@ public class DriverProfile {
     private String logo;  // Base64 encoded profile picture
 
     private Boolean available;
+
+    private Integer rating;  // Admin-assigned rating (1-5)
 }

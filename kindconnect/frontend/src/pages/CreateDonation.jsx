@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Package, Hash, FileText, CheckCircle, Gift, Sparkles, Building2, MapPin, User } from 'lucide-react';
 import { createDonation } from '../services/donationService';
@@ -65,9 +65,9 @@ export default function CreateDonation() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-12 max-w-md w-full text-center ring-1 ring-pink-100">
+          <div className="w-20 h-20 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce shadow-lg shadow-pink-300/40">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-800 mb-3">Donation Created!</h2>
@@ -75,7 +75,7 @@ export default function CreateDonation() {
           <div className="flex space-x-3">
             <button
               onClick={() => navigate('/donor/donations')}
-              className="flex-1 px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 font-semibold transition-all hover:scale-105"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white rounded-xl hover:from-pink-600 hover:via-rose-600 hover:to-purple-700 font-semibold transition-all hover:scale-105 shadow-lg"
             >
               View My Donations
             </button>
@@ -86,7 +86,7 @@ export default function CreateDonation() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50">
       {/* Navbar */}
       <Navbar />
 
@@ -94,13 +94,13 @@ export default function CreateDonation() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Selected NGO Banner (if donating to specific NGO) */}
         {selectedNgo && (
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 mb-6 shadow-lg">
+          <div className="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 rounded-2xl p-6 mb-6 shadow-lg shadow-pink-300/30 ring-1 ring-white/20">
             <div className="flex items-start gap-4">
               <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                 {selectedNgo.logo ? (
                   <img src={selectedNgo.logo} alt={selectedNgo.ngoName} className="w-12 h-12 object-contain rounded-lg" />
                 ) : (
-                  <Building2 className="w-8 h-8 text-blue-600" />
+                  <Building2 className="w-8 h-8 text-pink-600" />
                 )}
               </div>
               <div className="flex-1 text-white">
@@ -125,7 +125,7 @@ export default function CreateDonation() {
 
         {/* Page Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-pink-500 via-rose-500 to-purple-600 rounded-2xl mb-4 shadow-lg shadow-pink-300/40">
             <Gift className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-800 mb-3">
@@ -140,18 +140,18 @@ export default function CreateDonation() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl">
+            <p className="text-rose-800">{error}</p>
           </div>
         )}
 
         {/* Form */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-pink-100">
+        <div className="bg-white rounded-3xl shadow-xl p-8 ring-1 ring-pink-100/80">
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Item Type Selection */}
             <div>
               <label className="flex items-center space-x-2 text-lg font-bold text-gray-800 mb-4">
-                <Package className="w-6 h-6 text-pink-500" />
+                <Package className="w-6 h-6 text-rose-500" />
                 <span>What would you like to donate? <span className="text-red-500">*</span></span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -162,21 +162,21 @@ export default function CreateDonation() {
                     onClick={() => handleItemTypeSelect(category.value)}
                     className={`relative p-4 rounded-2xl border-2 transition-all duration-200 ${
                       formData.itemType === category.value
-                        ? 'border-pink-500 bg-pink-50 shadow-lg scale-105'
-                        : 'border-gray-200 hover:border-pink-300 hover:shadow-md'
+                        ? 'border-rose-400 bg-rose-50 shadow-lg scale-105 ring-1 ring-rose-200'
+                        : 'border-gray-200 hover:border-rose-300 hover:shadow-md'
                     }`}
                   >
                     <div className="text-center">
                       <div className="text-4xl mb-2">{category.icon}</div>
                       <p className={`text-sm font-semibold ${
-                        formData.itemType === category.value ? 'text-pink-600' : 'text-gray-700'
+                        formData.itemType === category.value ? 'text-rose-600' : 'text-gray-700'
                       }`}>
                         {category.value}
                       </p>
                     </div>
                     {formData.itemType === category.value && (
                       <div className="absolute top-2 right-2">
-                        <CheckCircle className="w-5 h-5 text-pink-500 fill-current" />
+                        <CheckCircle className="w-5 h-5 text-rose-500 fill-current" />
                       </div>
                     )}
                   </button>
@@ -187,14 +187,14 @@ export default function CreateDonation() {
             {/* Quantity */}
             <div>
               <label htmlFor="quantity" className="flex items-center space-x-2 text-lg font-bold text-gray-800 mb-3">
-                <Hash className="w-6 h-6 text-pink-500" />
+                <Hash className="w-6 h-6 text-rose-500" />
                 <span>Quantity <span className="text-red-500">*</span></span>
               </label>
               <div className="flex items-center space-x-4">
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, quantity: Math.max(1, prev.quantity - 1) }))}
-                  className="w-12 h-12 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold text-xl transition-all"
+                  className="w-12 h-12 bg-pink-50 hover:bg-pink-100 text-rose-600 rounded-xl font-bold text-xl transition-all ring-1 ring-pink-200"
                 >
                   -
                 </button>
@@ -206,12 +206,12 @@ export default function CreateDonation() {
                   required
                   value={formData.quantity}
                   onChange={handleChange}
-                  className="flex-1 text-center text-2xl font-bold px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  className="flex-1 text-center text-2xl font-bold px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-400 focus:border-transparent"
                 />
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, quantity: prev.quantity + 1 }))}
-                  className="w-12 h-12 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold text-xl transition-all"
+                  className="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-xl font-bold text-xl transition-all shadow-md"
                 >
                   +
                 </button>
@@ -221,7 +221,7 @@ export default function CreateDonation() {
             {/* Description */}
             <div>
               <label htmlFor="description" className="flex items-center space-x-2 text-lg font-bold text-gray-800 mb-3">
-                <FileText className="w-6 h-6 text-pink-500" />
+                <FileText className="w-6 h-6 text-rose-500" />
                 <span>Description <span className="text-red-500">*</span></span>
               </label>
               <textarea
@@ -231,16 +231,16 @@ export default function CreateDonation() {
                 rows="5"
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none text-gray-700"
+                className="w-full px-6 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-400 focus:border-transparent resize-none text-gray-700"
                 placeholder="Please provide details about your donation (condition, brand, size, etc.)"
               />
               <p className="mt-2 text-sm text-gray-500">Tip: Be as detailed as possible to help NGOs understand what you're donating</p>
             </div>
 
             {/* Info Box */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-l-4 border-purple-500 p-6 rounded-r-xl">
+            <div className="bg-gradient-to-r from-pink-50 via-rose-50 to-purple-50 border-l-4 border-rose-400 p-6 rounded-r-xl">
               <div className="flex items-start space-x-3">
-                <Sparkles className="w-6 h-6 text-purple-600 mt-0.5" />
+                <Sparkles className="w-6 h-6 text-rose-500 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-gray-800 mb-2">What happens next?</h4>
                   <ul className="text-sm text-gray-700 space-y-1">
@@ -257,7 +257,7 @@ export default function CreateDonation() {
             <button
               type="submit"
               disabled={loading || !formData.itemType}
-              className="w-full py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl hover:from-pink-600 hover:to-purple-700 font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white rounded-xl hover:from-pink-600 hover:via-rose-600 hover:to-purple-700 font-bold text-lg shadow-lg shadow-pink-300/30 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
               {loading ? (
                 <>

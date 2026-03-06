@@ -5,7 +5,7 @@ import {
   ArrowRight, Sparkles, TrendingUp, Star, Award, Zap,
   AlertCircle, RefreshCw, User, Phone
 } from 'lucide-react';
-import { getDriverProfile } from '../services/profileService';
+import { getDriverProfile, updateDriverAvailability } from '../services/profileService';
 import { getDriverDashboard, getAvailablePickups } from '../services/driverService';
 import Navbar from '../components/Navbar';
 
@@ -16,6 +16,7 @@ export default function DriverDashboard() {
   const [availablePickups, setAvailablePickups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAvailable, setIsAvailable] = useState(true);
+  const [toggling, setToggling] = useState(false);
   const [driverLogo, setDriverLogo] = useState(null);
 
   useEffect(() => {
@@ -143,14 +144,28 @@ export default function DriverDashboard() {
             </div>
             
             <div className="mt-6 md:mt-0 flex items-center space-x-4">
-              <div className={`px-6 py-3 rounded-2xl font-bold flex items-center space-x-2 ${
-                isAvailable 
-                  ? 'bg-green-400/30 text-green-100 border-2 border-green-300/50' 
-                  : 'bg-red-400/30 text-red-100 border-2 border-red-300/50'
-              }`}>
+              <button
+                onClick={async () => {
+                  try {
+                    setToggling(true);
+                    await updateDriverAvailability(!isAvailable);
+                    setIsAvailable(!isAvailable);
+                  } catch (err) {
+                    console.error('Failed to toggle availability:', err);
+                  } finally {
+                    setToggling(false);
+                  }
+                }}
+                disabled={toggling}
+                className={`px-6 py-3 rounded-2xl font-bold flex items-center space-x-2 cursor-pointer transition-all hover:scale-105 active:scale-95 disabled:opacity-60 ${
+                  isAvailable 
+                    ? 'bg-green-400/30 text-green-100 border-2 border-green-300/50 hover:bg-green-400/40' 
+                    : 'bg-red-400/30 text-red-100 border-2 border-red-300/50 hover:bg-red-400/40'
+                }`}
+              >
                 <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-green-300 animate-pulse' : 'bg-red-300'}`}></div>
-                <span>{isAvailable ? 'Online' : 'Offline'}</span>
-              </div>
+                <span>{toggling ? 'Updating...' : (isAvailable ? 'Online' : 'Offline')}</span>
+              </button>
             </div>
           </div>
         </div>
