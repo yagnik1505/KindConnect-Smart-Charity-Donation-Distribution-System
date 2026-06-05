@@ -4,7 +4,6 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/kindconnect/Auth_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Profile_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Donor_Service/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Donation_Service/pom.xml" />
@@ -13,6 +12,7 @@
         <option value="$PROJECT_DIR$/kindconnect/api-gateway/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/service-registry-eureka/pom.xml" />
         <option value="$PROJECT_DIR$/kindconnect/Api-gateway/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/kindconnect/Auth_Service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

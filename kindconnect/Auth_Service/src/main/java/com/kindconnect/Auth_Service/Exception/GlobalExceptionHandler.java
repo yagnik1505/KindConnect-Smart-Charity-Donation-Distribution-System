@@ -6,7 +6,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import tools.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +28,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<?> handleInvalidCredentials(InvalidCredentialsException ex) {
         return ResponseEntity.status(401)
+                .body(Map.of("Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<?> handleInvalidOtp(InvalidOtpException ex) {
+        return ResponseEntity.status(400)
+                .body(Map.of("Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpNotFoundException.class)
+    public ResponseEntity<?> handleOtpNotFound(OtpNotFoundException ex) {
+        return ResponseEntity.status(404)
+                .body(Map.of("Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpNotVerifiedException.class)
+    public ResponseEntity<?> handleOtpNotVerified(OtpNotVerifiedException ex) {
+        return ResponseEntity.status(400)
+                .body(Map.of("Error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<?> handleOtpExpired(OtpExpiredException ex) {
+        return ResponseEntity.status(410)
                 .body(Map.of("Error", ex.getMessage()));
     }
 

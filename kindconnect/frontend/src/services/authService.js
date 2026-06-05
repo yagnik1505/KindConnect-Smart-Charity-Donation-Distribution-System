@@ -29,6 +29,31 @@ export const register = async (email, password, role) => {
   return response.data;
 };
 
+// Request OTP - matches backend: POST /auth/register/request-otp
+// Backend returns: { "Message": "OTP sent successfully" }
+export const requestOtp = async (email) => {
+  const response = await api.post('/auth/register/request-otp', { email });
+  return response.data;
+};
+
+// Verify OTP - matches backend: POST /auth/register/verify-otp
+// Backend returns: { "Message": "OTP verified successfully" }
+export const verifyOtp = async (email, otpCode) => {
+  const response = await api.post('/auth/register/verify-otp', { email, otpCode });
+  return response.data;
+};
+
+// Complete Registration - matches backend: POST /auth/register/complete
+// Backend returns: { "Message": "User registered successfully" }
+export const completeRegistration = async (password, role, otpCode) => {
+  const response = await api.post('/auth/register/complete', {
+    password,
+    role, // DONOR, NGO, or DRIVER
+    otpCode,
+  });
+  return response.data;
+};
+
 // Login user - matches backend: POST /auth/login
 // Backend returns: { "message": "Login successful", "token": "..." }
 export const login = async (email, password) => {

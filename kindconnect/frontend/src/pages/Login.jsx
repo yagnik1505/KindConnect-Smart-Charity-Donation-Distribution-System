@@ -72,6 +72,7 @@ export default function Login() {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="email"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 placeholder="you@example.com"
               />
@@ -88,6 +89,7 @@ export default function Login() {
                 required
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="current-password"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                 placeholder="••••••••"
               />
