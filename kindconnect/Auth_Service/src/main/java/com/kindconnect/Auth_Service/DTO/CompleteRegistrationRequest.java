@@ -2,6 +2,7 @@ package com.kindconnect.Auth_Service.DTO;
 
 import com.kindconnect.Auth_Service.Model.Role;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -10,6 +11,10 @@ import lombok.Data;
 
 @Data
 public class CompleteRegistrationRequest {
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     @Pattern(

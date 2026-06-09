@@ -1,31 +1,30 @@
 package com.kindconnect.Auth_Service.Service;
 
 import java.security.SecureRandom;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.kindconnect.Auth_Service.Exception.InvalidOtpException;
 import com.kindconnect.Auth_Service.Exception.OtpExpiredException;
 import com.kindconnect.Auth_Service.Exception.OtpNotFoundException;
 import com.kindconnect.Auth_Service.Exception.OtpNotVerifiedException;
 import com.kindconnect.Auth_Service.Exception.UserAlreadyExistsException;
-import com.kindconnect.Auth_Service.Model.EmailOtp;
-import com.kindconnect.Auth_Service.Repository.EmailOtpRepository;
 import com.kindconnect.Auth_Service.Repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpService {
 
-    private final EmailOtpRepository emailOtpRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${otp.expiration.minutes:5}")
     private long otpExpirationMinutes;
@@ -33,70 +32,68 @@ public class OtpService {
     @Value("${otp.length:6}")
     private int otpLength;
 
-    @Transactional
     public void requestOtp(String email) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new UserAlreadyExistsException("Email already registered");
         }
 
-        emailOtpRepository.deleteByEmail(email);
-
         String otpCode = generateOtp();
-        Instant now = Instant.now();
-
-        EmailOtp otp = new EmailOtp();
-        otp.setEmail(email);
-        otp.setOtpCode(otpCode);
-        otp.setExpiresAt(now.plus(otpExpirationMinutes, ChronoUnit.MINUTES));
-        otp.setCreatedAt(now);
-        otp.setUsed(false);
-
-        emailOtpRepository.save(otp);
+        log.info("Generated OTP for: {}", email);
+        
+        saveOtp(email, otpCode);
+        
         emailService.sendOtpEmail(email, otpCode);
     }
 
-    @Transactional
     public void verifyOtp(String email, String otpCode) {
-        EmailOtp otp = emailOtpRepository.findByEmailAndOtpCodeAndUsedFalse(email, otpCode)
-                .orElseThrow(() -> new InvalidOtpException("Invalid OTP"));
+        String key = "otp:" + email;
+        String storedOtp = redisTemplate.opsForValue().get(key);
 
-        if (otp.getExpiresAt().isBefore(Instant.now())) {
-            throw new OtpExpiredException("OTP expired");
+        if (storedOtp == null) {
+            log.warn("Failed OTP verification for {}: OTP expired or not found", email);
+            throw new OtpExpiredException("OTP expired or not found");
         }
 
-        otp.setUsed(true);
-        emailOtpRepository.save(otp);
+        if (!storedOtp.equals(otpCode)) {
+            log.warn("Failed OTP verification for {}: Invalid OTP", email);
+            throw new InvalidOtpException("Invalid OTP");
+        }
+
+        log.info("OTP verified successfully for: {}", email);
+        
+        // On success
+        markVerified(email);
+        removeOtp(email);
     }
 
-    public void assertOtpVerified(String email) {
-        EmailOtp otp = emailOtpRepository.findTopByEmailOrderByCreatedAtDesc(email)
-                .orElseThrow(() -> new OtpNotFoundException("OTP not requested"));
-
-        if (!otp.isUsed()) {
-            throw new OtpNotVerifiedException("OTP not verified");
-        }
-
-        if (otp.getExpiresAt().isBefore(Instant.now())) {
-            throw new OtpExpiredException("OTP expired");
-        }
+    public void saveOtp(String email, String otpCode) {
+        String key = "otp:" + email;
+        redisTemplate.opsForValue().set(key, otpCode, Duration.ofMinutes(otpExpirationMinutes));
+        log.info("Stored OTP in Redis: {}", key);
     }
 
-    public String getEmailFromVerifiedOtp(String otpCode) {
-        EmailOtp otp = emailOtpRepository.findTopByOtpCodeOrderByCreatedAtDesc(otpCode)
-                .orElseThrow(() -> new OtpNotFoundException("OTP not found or already used"));
-
-        if (!otp.isUsed()) {
-            throw new OtpNotVerifiedException("OTP not verified");
-        }
-        if (otp.getExpiresAt().isBefore(Instant.now())) {
-            throw new OtpExpiredException("OTP has expired");
-        }
-        return otp.getEmail();
+    public void markVerified(String email) {
+        String key = "verified:" + email;
+        redisTemplate.opsForValue().set(key, "true", Duration.ofMinutes(10));
+        log.info("Verification key created: {}", key);
     }
 
-    @Transactional
-    public void clearOtps(String email) {
-        emailOtpRepository.deleteByEmail(email);
+    public boolean isVerified(String email) {
+        String key = "verified:" + email;
+        String verified = redisTemplate.opsForValue().get(key);
+        return "true".equals(verified);
+    }
+
+    public void removeOtp(String email) {
+        String key = "otp:" + email;
+        redisTemplate.delete(key);
+        log.debug("OTP removed: {}", key);
+    }
+
+    public void removeVerification(String email) {
+        String key = "verified:" + email;
+        redisTemplate.delete(key);
+        log.info("Verification key removed: {}", key);
     }
 
     private String generateOtp() {

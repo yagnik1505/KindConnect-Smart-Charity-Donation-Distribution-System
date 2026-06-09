@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="service-registry-eureka" />
-        <module name="profile-service" />
         <module name="Profile_Service" />
       </profile>
       <profile name="Annotation profile for Auth_Service" enabled="true">
@@ -17,21 +16,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
         </processorPath>
         <module name="ngo-service" />
-        <module name="Auth_Service" />
-      </profile>
-      <profile name="Annotation profile for Ngo_Service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
-        </processorPath>
+        <module name="profile-service" />
         <module name="Donation_Service" />
         <module name="Driver_Service" />
+        <module name="Auth_Service" />
         <module name="Ngo_Service" />
       </profile>
     </annotationProcessing>
