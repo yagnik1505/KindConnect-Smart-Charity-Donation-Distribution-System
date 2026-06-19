@@ -63,31 +63,31 @@ KindConnect/
 
 ### Login Page
 
-![Login](assets/login.png)
+![Login](kindconnect/frontend/src/assets/login.png)
 
 ### Home Page
 
-![Home](assets/home.png)
+![Home](kindconnect/frontend/src/assets/home.png)
 
 ### Fundraisers
 
-![Fundraisers](assets/fundraisers.png)
+![Fundraisers](kindconnect/frontend/src/assets/fundraisers.png)
 
 ### Detailed Fundraiser
 
-![Detailed Fundraiser](assets/Detailed_fundraisers.png)
+![Detailed Fundraiser](kindconnect/frontend/src/assets/Detailed_fundraisers.png)
 
 ### NGO Dashboard
 
-![NGO Dashboard](assets/ngo.png)
+![NGO Dashboard](kindconnect/frontend/src/assets/ngo.png)
 
 ### Driver Dashboard
 
-![Driver Dashboard](assets/driver.png)
+![Driver Dashboard](kindconnect/frontend/src/assets/driver.png)
 
 ### Admin Dashboard
 
-![Admin Dashboard](assets/admin.png)
+![Admin Dashboard](kindconnect/frontend/src/assets/admin.png)
 
 ---
 
