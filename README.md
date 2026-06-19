@@ -75,15 +75,15 @@ KindConnect/
 
 ### Detailed Fundraiser
 
-![Detailed Fundraiser](kindconnect/frontend/src/assets/Detailed_fundraisers.png)
+![Detailed Fundraiser](kindconnect/frontend/src/assets/Detailed_fundraiser.png)
 
 ### NGO Dashboard
 
-![NGO Dashboard](kindconnect/frontend/src/assets/ngo.png)
+![NGO Dashboard](kindconnect/frontend/src/assets/Ngo.png)
 
 ### Driver Dashboard
 
-![Driver Dashboard](kindconnect/frontend/src/assets/driver.png)
+![Driver Dashboard](kindconnect/frontend/src/assets/Driver.png)
 
 ### Admin Dashboard
 
